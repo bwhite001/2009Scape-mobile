@@ -52,7 +52,7 @@ class ScapeLauncher : BaseActivity() {
                     progress = state,
                     onPlayHd = { launchIfReady(state) { startActivity(Intent(this, MainActivity::class.java)) } },
                     onPlaySd = { launchIfReady(state) { startActivity(Intent(this, JavaGUILauncherActivity::class.java)) } },
-                    onSettings = { MyDialogFragment().show(supportFragmentManager, "settings") },
+                    onSettings = { startActivity(Intent(this, SettingsActivity::class.java)) },
                 )
             }
         }
