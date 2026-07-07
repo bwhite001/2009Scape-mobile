@@ -37,6 +37,7 @@ import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.gamepad.Gamepad;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.EfficientAndroidLWJGLKeycode;
+import net.kdt.pojavlaunch.utils.Haptics;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
@@ -224,6 +225,7 @@ public class GLFWGLSurface extends View implements GrabListener {
                 @Override
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
+                    Haptics.vibrate(getContext(), Haptics.LONG_PRESS_MS);
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 }
             });
