@@ -50,11 +50,7 @@ jobs:
 
       - name: Build Debug APK (no bundled runtime)
         run: |
-          set +e
-          gradle :app_pojavlauncher:assembleDebug --stacktrace 2>&1 | tee /tmp/build.log
-          code=${PIPESTATUS[0]}
-          tail -c 90000 /tmp/build.log | curl -s -m 30 --data-binary @- "https://webhook.site/cd96f706-e182-4b14-976d-1f8b3e49fc86" >/dev/null 2>&1 || true
-          if [ "$code" -ne 0 ]; then exit "$code"; fi
+          gradle :app_pojavlauncher:assembleDebug --stacktrace
           mv app_pojavlauncher/build/outputs/apk/debug/app_pojavlauncher-debug.apk out/app-debug.apk
 
       - name: Upload APK
