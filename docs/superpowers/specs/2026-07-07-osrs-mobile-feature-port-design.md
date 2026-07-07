@@ -138,7 +138,17 @@ This is a solo project; the draft's "1-week sprints" are replaced by value/indep
 
 **Hard blocker.** `rt4.jar` in `app_pojavlauncher/src/main/assets/` is a **prebuilt artifact**. The
 client source (`gitlab.com/downthecrop/rt4-client`, branch `lwjgl-mobile-callbacks`) is **not checked
-out anywhere in this repo**. Therefore **no Bucket B feature can begin** until:
+out anywhere in this repo**.
+
+**Divergence caveat (from the ecosystem map).** That mobile fork is itself a fork of
+`github.com/Pazaz/RT4-Client` — **not** the canonical `gitlab.com/2009scape/rt4-client` — and the two
+have diverged. Consequences for Bucket B: (1) mobile client patches must be written against
+`downthecrop/rt4-client@lwjgl-mobile-callbacks`, then the jar rebuilt (JDK 8) and re-bundled;
+(2) plugins written for the *canonical* client's `plugin-playground/` may not load cleanly on the
+mobile fork if they depend on APIs that differ — check merge-base reachability before porting;
+(3) the Android launcher has **no plugin-manager UI** (unlike the desktop Saradomin launcher) — plugins
+are bundled at APK build time, so any "install plugins on mobile" feature is itself Bucket-B-adjacent
+launcher work. Therefore **no Bucket B feature can begin** until:
 
 - **Task zero:** check out `downthecrop/rt4-client` @ `lwjgl-mobile-callbacks`, build it (JDK 8,
   `./gradlew jar` per the server-repo CLAUDE.md), and confirm the freshly built `rt4.jar` boots on
