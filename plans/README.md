@@ -17,14 +17,18 @@ Recommended order puts the verification baseline first (it provides the checklis
 the behavioral fixes are verified against). The five fixes are independent of each
 other and can be done in any order / parallel branches.
 
+All six executed and merged to `master` (commit `b74e73fcb`, CI green). Rows marked
+DONE are compile-verified via CI; behavioral fixes (003, 005) still need the on-device
+checks in `docs/verification/device-smoke-checklist.md`.
+
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 006  | Verification baseline (build gate + device smoke checklist) | P1 (unblocker) | S | — | TODO |
-| 001  | Reject Zip-Slip entries in ZIP extraction | P1 | S | — | TODO |
-| 002  | Close streams + check HTTP status in monitored downloads | P1 | S | — | TODO |
-| 003  | Fail `compareSHA1` closed on read error | P1 | S | — | TODO |
-| 004  | Fix Cursor leak in `Tools.getFileName` | P2 | S | — | TODO |
-| 005  | Reload prefs on settings-exit, not per keystroke | P1 | S | — | TODO |
+| 006  | Verification baseline (build gate + device smoke checklist) | P1 (unblocker) | S | — | DONE (CI green) |
+| 001  | Reject Zip-Slip entries in ZIP extraction | P1 | S | — | DONE (CI green) |
+| 002  | Close streams + check HTTP status in monitored downloads | P1 | S | — | DONE (CI green) |
+| 003  | Fail `compareSHA1` closed on read error | P1 | S | — | DONE (CI green; device-verify launch) |
+| 004  | Fix Cursor leak in `Tools.getFileName` | P2 | S | — | DONE (CI green) |
+| 005  | Reload prefs on settings-exit, not per keystroke | P1 | S | — | DONE (CI green; device-verify settings) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
