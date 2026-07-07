@@ -225,6 +225,9 @@ public class GLFWGLSurface extends View implements GrabListener {
                 @Override
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
+                    // In single-tap-right-click mode a normal tap already opens the menu,
+                    // so the long-press right-click is redundant — skip it (and its haptic) entirely.
+                    if (LauncherPreferences.PREF_SINGLE_TAP_RIGHTCLICK) return;
                     Haptics.vibrate(getContext(), Haptics.LONG_PRESS_MS);
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 }
@@ -244,11 +247,12 @@ public class GLFWGLSurface extends View implements GrabListener {
     public boolean onTouchEvent(MotionEvent e) {
         scaleGestureDetector.onTouchEvent(e);
         longPressDetector.onTouchEvent(e);
+        // Kinda need to send this back to the layout
+        if(((ControlLayout)getParent()).getModifiable()) return false;
+        // Show the tap indicator only during real gameplay, not in the controls editor.
         if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
             TapIndicatorView.showTap(e.getX(), e.getY());
         }
-        // Kinda need to send this back to the layout
-        if(((ControlLayout)getParent()).getModifiable()) return false;
 
         // Looking for a mouse to handle, won't have an effect if no mouse exists.
         for (int i = 0; i < e.getPointerCount(); i++) {
