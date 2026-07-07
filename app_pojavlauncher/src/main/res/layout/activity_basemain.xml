@@ -54,6 +54,12 @@
 				android:elevation="10dp"
 				android:layout_gravity="center_horizontal"/>
 
+			<net.kdt.pojavlaunch.TapIndicatorView
+				android:id="@+id/main_tap_indicator"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:elevation="5dp"/>
+
 		</net.kdt.pojavlaunch.customcontrols.ControlLayout>
 
 		<com.kdt.LoggerView

@@ -68,6 +68,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     private GLFWGLSurface minecraftGLView;
     private static Touchpad touchpad;
     private LoggerView loggerView;
+    private TapIndicatorView tapIndicatorView;
     private DrawerLayout drawerLayout;
     private ListView navDrawer;
     private View mDrawerPullButton;
@@ -209,6 +210,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         touchCharInput = findViewById(R.id.mainTouchCharInput);
         mDrawerPullButton = findViewById(R.id.drawer_button);
         contentFrame = findViewById(R.id.content_frame);
+        tapIndicatorView = findViewById(R.id.main_tap_indicator);
         int inset = (int) PREF_INSET_X;
         //touchpad.setPadding(inset,inset,inset,inset);
         contentFrame.setPadding(inset,inset,inset,inset);

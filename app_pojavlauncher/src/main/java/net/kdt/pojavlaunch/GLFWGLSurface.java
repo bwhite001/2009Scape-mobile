@@ -244,6 +244,9 @@ public class GLFWGLSurface extends View implements GrabListener {
     public boolean onTouchEvent(MotionEvent e) {
         scaleGestureDetector.onTouchEvent(e);
         longPressDetector.onTouchEvent(e);
+        if (e.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            TapIndicatorView.showTap(e.getX(), e.getY());
+        }
         // Kinda need to send this back to the layout
         if(((ControlLayout)getParent()).getModifiable()) return false;
 
