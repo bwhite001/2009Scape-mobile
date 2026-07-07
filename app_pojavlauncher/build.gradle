@@ -152,13 +152,19 @@ android {
         buildConfig true
     }
 
+    // Source/target stays at 8: the app ships compile-time stubs in platform
+    // packages (e.g. dalvik.annotation.optimization.CriticalNative). Java >= 9
+    // source mode enables the module system, which rejects redefining a
+    // platform-owned package ("package exists in another module: java.base").
+    // AGP 8 only requires the *toolchain* to run on JDK 17 (it does); the
+    // source LEVEL can remain 8. Raising it is deferred (needs stub handling).
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '1.8'
     }
 
     bundle {
