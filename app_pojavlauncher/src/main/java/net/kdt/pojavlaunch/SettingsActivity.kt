@@ -101,6 +101,13 @@ class SettingsActivity : BaseActivity() {
             }
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        // Reload the legacy static prefs bank once when leaving settings, instead
+        // of on every write (which ran a full filesystem prefs reload per keystroke).
+        PojavApplication.appContainer.preferencesRepository.reloadLauncherPreferences()
+    }
 }
 
 @Composable

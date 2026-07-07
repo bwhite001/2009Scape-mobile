@@ -541,6 +541,10 @@ public final class Tools {
                 byte[] buffer = new byte[BUFFER_SIZE];
                 while ((ze = zis.getNextEntry()) != null) {
                     File file = new File(targetDirectory, ze.getName());
+                    String canonicalTarget = targetDirectory.getCanonicalPath() + File.separator;
+                    if (!file.getCanonicalPath().startsWith(canonicalTarget)) {
+                        throw new IOException("Blocked zip-slip entry outside target directory: " + ze.getName());
+                    }
                     File dir = ze.isDirectory() ? file : file.getParentFile();
                     if (!dir.isDirectory() && !dir.mkdirs())
                         throw new FileNotFoundException("Failed to ensure directory: " +
@@ -568,14 +572,13 @@ public final class Tools {
             try (InputStream is = new FileInputStream(f)) {
                 sha1_dst = new String(Hex.encodeHex(org.apache.commons.codec.digest.DigestUtils.sha1(is)));
             }
-            if(sourceSHA != null) {
-                return sha1_dst.equalsIgnoreCase(sourceSHA);
-            } else{
-                return true; // fake match
-            }
-        }catch (IOException e) {
-            Log.i("SHA1","Fake-matching a hash due to a read error",e);
-            return true;
+            // A null expected hash means the caller opted out of verification (best-effort).
+            if (sourceSHA == null) return true;
+            return sha1_dst.equalsIgnoreCase(sourceSHA);
+        } catch (IOException e) {
+            // Fail closed: an unreadable/corrupt file is NOT verified.
+            Log.w("SHA1", "Hash check failed to read file; treating as mismatch", e);
+            return false;
         }
     }
 
@@ -612,14 +615,12 @@ public final class Tools {
     }
 
     public static String getFileName(Context ctx, Uri uri) {
-        Cursor c = ctx.getContentResolver().query(uri, null, null, null, null);
-        if(c == null) return uri.getLastPathSegment(); // idk myself but it happens on asus file manager
-        c.moveToFirst();
-        int columnIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        if(columnIndex == -1) return uri.getLastPathSegment();
-        String fileName = c.getString(columnIndex);
-        c.close();
-        return fileName;
+        try (Cursor c = ctx.getContentResolver().query(uri, null, null, null, null)) {
+            if (c == null || !c.moveToFirst()) return uri.getLastPathSegment();
+            int columnIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            if (columnIndex == -1) return uri.getLastPathSegment();
+            return c.getString(columnIndex);
+        }
     }
 
 

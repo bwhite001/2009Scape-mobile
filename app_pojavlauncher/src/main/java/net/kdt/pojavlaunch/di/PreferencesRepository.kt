@@ -29,7 +29,6 @@ class PreferencesRepository(private val context: Context) {
 
     private inline fun commit(block: SharedPreferences.Editor.() -> Unit) {
         prefs.edit().apply(block).apply()
-        reloadLauncherPreferences()
     }
 
     /** Keep the legacy static fields (read by the launch path) in sync after a write. */
