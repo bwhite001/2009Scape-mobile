@@ -1,6 +1,10 @@
 [versions]
 agp = "8.7.3"
 kotlin = "2.0.21"
+coroutines = "1.8.1"
+composeBom = "2024.09.03"
+lifecycle = "2.8.6"
+activityCompose = "1.9.2"
 
 javaxAnnotation = "1.3.2"
 commonsCodec = "1.15"
@@ -39,6 +43,17 @@ xz = { module = "org.tukaani:xz", version.ref = "xz" }
 exp4j = { module = "com.github.PojavLauncherTeam:exp4j", version.ref = "exp4j" }
 htmlcleaner = { module = "net.sourceforge.htmlcleaner:htmlcleaner", version.ref = "htmlcleaner" }
 
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

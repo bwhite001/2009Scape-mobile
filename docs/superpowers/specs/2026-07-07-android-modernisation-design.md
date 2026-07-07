@@ -101,7 +101,7 @@ Compose only for pre-game screens; the GL/AWT surface stays View-based.
 Kotlin + coroutines; `androidx.lifecycle` (viewmodel/runtime-ktx); a DI framework (Hilt or alternative — decided per §5.1); Material `1.12.x`; Compose BOM + `ui`/`material3`/`activity-compose`; OkHttp; Sentry. Exact versions resolved in Phase 1's `libs.versions.toml` against AGP 8 / Kotlin compatibility.
 
 ## 5. Open questions (resolve before/within Phase 2)
-1. **DI: Hilt vs. manual DI vs. Koin.** Hilt is the Android-standard but adds kapt/KSP + build cost to a small shell. A hand-rolled service locator may suffice. *Recommendation: decide at Phase 2 start once module boundaries are clear.*
+1. **DI: Hilt vs. manual DI vs. Koin.** **RESOLVED (2026-07-07): manual service-locator** — a small hand-rolled DI object. Zero new build cost (no kapt/KSP), trivial to reason about, and easiest to verify blind; fits a shell with a handful of dependencies. Phase 2 also **folds in Phase 4 (Compose)** per the chosen "full Kotlin + Compose shell" depth — one combined shell-modernisation effort. Because CI can only prove compilation, Phase 2 is sliced into small, independently device-testable steps with hardware smoke-test checkpoints.
 2. **Kotlin DSL conversion** — do it in Phase 1 or leave Groovy indefinitely? (Cosmetic; no functional impact.)
 3. **Sentry hosting** — self-hosted vs. sentry.io; DSN provisioning.
 
