@@ -1,0 +1,44 @@
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+
+javaxAnnotation = "1.3.2"
+commonsCodec = "1.15"
+androidxPreference = "1.2.0"
+androidxDrawerlayout = "1.2.0"
+androidxViewpager2 = "1.1.0-beta01"
+androidxAnnotation = "1.5.0"
+constraintlayout = "2.1.4"
+checkerboarddrawable = "1.0.2"
+portraitSdp = "ed33e89cbc"
+portraitSsp = "6c02fd739b"
+extendedView = "1.0.0"
+gamepadRemapper = "71397676b5"
+xz = "1.8"
+exp4j = "60eaec6f78"
+htmlcleaner = "2.6.1"
+appcompat = "1.6.1"
+material = "1.5.0"
+
+[libraries]
+javax-annotation = { module = "javax.annotation:javax.annotation-api", version.ref = "javaxAnnotation" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
+androidx-preference = { module = "androidx.preference:preference", version.ref = "androidxPreference" }
+androidx-drawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "androidxDrawerlayout" }
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "androidxViewpager2" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxAnnotation" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+checkerboarddrawable = { module = "com.github.duanhong169:checkerboarddrawable", version.ref = "checkerboarddrawable" }
+portrait-sdp = { module = "com.github.PojavLauncherTeam:portrait-sdp", version.ref = "portraitSdp" }
+portrait-ssp = { module = "com.github.PojavLauncherTeam:portrait-ssp", version.ref = "portraitSsp" }
+extended-view = { module = "com.github.Mathias-Boulay:ExtendedView", version.ref = "extendedView" }
+gamepad-remapper = { module = "com.github.Mathias-Boulay:android_gamepad_remapper", version.ref = "gamepadRemapper" }
+xz = { module = "org.tukaani:xz", version.ref = "xz" }
+exp4j = { module = "com.github.PojavLauncherTeam:exp4j", version.ref = "exp4j" }
+htmlcleaner = { module = "net.sourceforge.htmlcleaner:htmlcleaner", version.ref = "htmlcleaner" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
