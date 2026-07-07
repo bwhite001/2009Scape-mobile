@@ -266,7 +266,10 @@ public class GLFWGLSurface extends View implements GrabListener {
             CallbackBridge.mouseY = (e.getY() * mScaleFactor);
             //One android click = one MC click
             if(mSingleTapDetector.onTouchEvent(e)){ //
-                CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, CallbackBridge.mouseX, CallbackBridge.mouseY);
+                int tapButton = LauncherPreferences.PREF_SINGLE_TAP_RIGHTCLICK
+                        ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
+                        : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
+                CallbackBridge.putMouseEventWithCoords(tapButton, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 return true;
             }
         }

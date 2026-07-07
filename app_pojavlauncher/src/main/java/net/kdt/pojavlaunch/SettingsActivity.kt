@@ -53,6 +53,7 @@ private val VIDEO_INTS = listOf(
 private val CONTROL_BOOLS = listOf(
     BoolPref("disableGestures", "Disable gestures", false),
     BoolPref("disableDoubleTap", "Disable double-tap to swap hands", false),
+    BoolPref("singleTapRightClick", "Single-tap opens right-click menu", false),
     BoolPref("mouse_start", "Start with virtual mouse enabled", false),
     BoolPref("buttonAllCaps", "Uppercase button labels", true),
     BoolPref("enableGyro", "Enable gyro aiming", false),
