@@ -1,5 +1,6 @@
 package net.kdt.pojavlaunch.customcontrols.buttons;
 
+import static net.kdt.pojavlaunch.utils.LwjglGlfwKeycode.GLFW_KEY_ENTER;
 import static net.kdt.pojavlaunch.utils.LwjglGlfwKeycode.GLFW_KEY_UNKNOWN;
 import static org.lwjgl.glfw.CallbackBridge.sendKeyPress;
 import static org.lwjgl.glfw.CallbackBridge.sendMouseButton;
@@ -15,13 +16,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import net.kdt.pojavlaunch.utils.LwjglGlfwKeycode;
+import net.kdt.pojavlaunch.AWTInputBridge;
+import net.kdt.pojavlaunch.AWTInputEvent;
 import net.kdt.pojavlaunch.MainActivity;
 import net.kdt.pojavlaunch.R;
 import net.kdt.pojavlaunch.customcontrols.ControlData;
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.handleview.EditControlPopup;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+import net.kdt.pojavlaunch.utils.LwjglGlfwKeycode;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -236,6 +239,27 @@ public class ControlButton extends TextView implements ControlInterface {
             case ControlData.SPECIALBTN_MENU:
                 mControlLayout.notifyAppMenu();
                 break;
+
+            case ControlData.SPECIALBTN_COMMAND:
+                if (isDown) sendChatCommand(mProperties.commandText);
+                break;
+        }
+    }
+
+    private void sendChatCommand(String command) {
+        if (command == null || command.isEmpty()) return;
+        if (AWTInputBridge.isAwtActive) {
+            AWTInputBridge.sendKey((char) AWTInputEvent.VK_ENTER, AWTInputEvent.VK_ENTER);
+            for (char c : command.toCharArray()) {
+                AWTInputBridge.sendChar(c);
+            }
+            AWTInputBridge.sendKey((char) AWTInputEvent.VK_ENTER, AWTInputEvent.VK_ENTER);
+        } else {
+            sendKeyPress(GLFW_KEY_ENTER);
+            for (char c : command.toCharArray()) {
+                org.lwjgl.glfw.CallbackBridge.sendChar(c, 0);
+            }
+            sendKeyPress(GLFW_KEY_ENTER);
         }
     }
 

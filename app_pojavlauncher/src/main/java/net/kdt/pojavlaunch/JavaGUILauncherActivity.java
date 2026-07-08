@@ -24,6 +24,7 @@ import androidx.activity.OnBackPressedCallback;
 
 import com.kdt.LoggerView;
 
+import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.keyboard.AwtCharSender;
 import net.kdt.pojavlaunch.customcontrols.keyboard.TouchCharInput;
 import net.kdt.pojavlaunch.multirt.MultiRTUtils;
@@ -91,6 +92,16 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         mGestureDetector = new GestureDetector(this, new SingleTapConfirm());
         mTouchPad.setFocusable(false);
         mTouchPad.setVisibility(View.GONE);
+
+        // Load the on-screen control overlay (same layout as HD mode)
+        AWTInputBridge.isAwtActive = true;
+        ControlLayout awtControlLayout = findViewById(R.id.awt_control_layout);
+        awtControlLayout.setModifiable(false);
+        try {
+            awtControlLayout.loadLayout(LauncherPreferences.PREF_DEFAULTCTRL_PATH);
+        } catch (Exception e) {
+            try { awtControlLayout.loadLayout(Tools.CTRLDEF_FILE); } catch (Exception ignored) {}
+        }
 
         mMousePointerImageView.post(() -> {
             ViewGroup.LayoutParams params = mMousePointerImageView.getLayoutParams();
@@ -261,6 +272,12 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         final int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         final View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    @Override
+    protected void onDestroy() {
+        AWTInputBridge.isAwtActive = false;
+        super.onDestroy();
     }
 
     public static class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {

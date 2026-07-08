@@ -148,5 +148,10 @@
 		android:visibility="gone"
 		/>
 
+	<net.kdt.pojavlaunch.customcontrols.ControlLayout
+		android:id="@+id/awt_control_layout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+
 </FrameLayout>
 

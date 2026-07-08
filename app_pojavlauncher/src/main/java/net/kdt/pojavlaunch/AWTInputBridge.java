@@ -1,6 +1,9 @@
 package net.kdt.pojavlaunch;
 
 public class AWTInputBridge {
+    /** Set to true by JavaGUILauncherActivity so ControlButtons know to use AWT input. */
+    public static volatile boolean isAwtActive = false;
+
     public static final int EVENT_TYPE_CHAR = 1000;
     public static final int EVENT_TYPE_CURSOR_POS = 1003;
     public static final int EVENT_TYPE_KEY = 1005;
