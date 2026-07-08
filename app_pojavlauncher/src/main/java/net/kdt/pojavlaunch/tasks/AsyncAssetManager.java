@@ -60,14 +60,48 @@ public class AsyncAssetManager {
         });
     }
 
-    /** Unpack single files, with no regard to version tracking */
+    private static final String PREF_ASSET_VERSION = "asset_version";
+
+    private static String readInputStreamFully(InputStream is) throws IOException {
+        byte[] buf = new byte[64];
+        int n = is.read(buf);
+        return n > 0 ? new String(buf, 0, n).trim() : "";
+    }
+
+    /** Returns true if the bundled asset version is newer than what's stored in prefs. */
+    private static boolean assetVersionChanged(Context ctx) {
+        try {
+            InputStream is = ctx.getAssets().open("build_version.txt");
+            int bundled = Integer.parseInt(readInputStreamFully(is));
+            is.close();
+            int stored = ctx.getSharedPreferences("launcher", Context.MODE_PRIVATE)
+                    .getInt(PREF_ASSET_VERSION, 0);
+            return bundled > stored;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    /** Saves the bundled asset version to prefs so we don't re-copy next time. */
+    private static void saveAssetVersion(Context ctx) {
+        try {
+            InputStream is = ctx.getAssets().open("build_version.txt");
+            int bundled = Integer.parseInt(readInputStreamFully(is));
+            is.close();
+            ctx.getSharedPreferences("launcher", Context.MODE_PRIVATE)
+                    .edit().putInt(PREF_ASSET_VERSION, bundled).apply();
+        } catch (Exception ignored) {}
+    }
+
     public static void unpackSingleFiles(Context ctx){
         ProgressLayout.setProgress(ProgressLayout.EXTRACT_SINGLE_FILES, 0);
         sExecutorService.execute(() -> {
             try {
-                Tools.copyAssetFile(ctx, "options.txt", Tools.DIR_GAME_NEW, false);
-                Tools.copyAssetFile(ctx, "default.json", Tools.CTRLMAP_PATH, false);
+                boolean overwrite = assetVersionChanged(ctx);
+                Tools.copyAssetFile(ctx, "options.txt", Tools.DIR_GAME_NEW, false); // never overwrite user options
+                Tools.copyAssetFile(ctx, "default.json", Tools.CTRLMAP_PATH, overwrite);
                 Tools.copyAssetFile(ctx, "launcher_profiles.json", Tools.DIR_GAME_NEW, false);
+                if (overwrite) saveAssetVersion(ctx);
             } catch (IOException e) {
                 Log.e("AsyncAssetManager", "Failed to unpack critical components !");
             }
@@ -86,7 +120,7 @@ public class AsyncAssetManager {
                 unpackComponent(ctx, "lwjgl3", false);
                 unpackComponent(ctx, "security", true);
                 Tools.copyAssetFile(ctx,"rt4.jar",Tools.DIR_DATA, false); // Change this to true if you're working on client features.
-                Tools.copyAssetFile(ctx,"config.json",Tools.DIR_DATA, false);
+                Tools.copyAssetFile(ctx,"config.json",Tools.DIR_DATA, assetVersionChanged(ctx));
 
                 // Unzip the plugins for use.
                 extractAllPlugins(ctx);
