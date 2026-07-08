@@ -150,7 +150,47 @@ public final class Tools {
     }
 
 
+    /**
+     * Reads serverIp/serverPort from SharedPreferences and patches the on-disk config.json
+     * so the RT4-Client connects to the user's LAN server instead of the bundled default.
+     */
+    private static void patchConfigJson(Activity activity) {
+        try {
+            android.content.SharedPreferences prefs =
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity);
+            String ip   = prefs.getString("serverIp",   "127.0.0.1");
+            String port = prefs.getString("serverPort",  "43595");
+            if (ip == null || ip.isEmpty()) return;
+
+            File configFile = new File(DIR_DATA, "config.json");
+            if (!configFile.exists()) return;
+
+            String raw = read(configFile.getAbsolutePath());
+            org.json.JSONObject json = new org.json.JSONObject(raw);
+            json.put("ip_address",    ip);
+            json.put("ip_management", ip);
+            if (port == null || port.trim().isEmpty()) port = "43595";
+            int portInt;
+            try {
+                portInt = Integer.parseInt(port.trim());
+            } catch (NumberFormatException e) {
+                portInt = 43595;
+                android.util.Log.w("Tools", "patchConfigJson: invalid port '" + port + "', using 43595");
+            }
+            json.put("server_port", portInt - 1); // server_port in config is worldId-based (43594 for world 1)
+            json.put("wl_port",     portInt);
+            json.put("js5_port",    portInt);
+
+            try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                fw.write(json.toString(2));
+            }
+        } catch (Exception e) {
+            android.util.Log.w("Tools", "patchConfigJson failed: " + e.getMessage());
+        }
+    }
+
     public static void launchGLJRE(final Activity activity) throws Throwable {
+        patchConfigJson(activity);
 
         Runtime runtime = MultiRTUtils.forceReread("Internal");
         File gamedir = new File(Tools.DIR_DATA);

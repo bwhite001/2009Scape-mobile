@@ -27,9 +27,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.kdt.pojavlaunch.customcontrols.CustomControlsActivity
 import net.kdt.pojavlaunch.di.PreferencesRepository
@@ -37,6 +39,12 @@ import net.kdt.pojavlaunch.ui.theme.LauncherTheme
 
 private data class BoolPref(val key: String, val label: String, val def: Boolean)
 private data class IntPref(val key: String, val label: String, val def: Int, val range: IntRange)
+private data class StringPref(
+    val key: String,
+    val label: String,
+    val def: String,
+    val keyboardType: KeyboardType = KeyboardType.Text,
+)
 
 // Simple, safe-to-model preferences (exact SharedPreferences keys preserved).
 // GL-critical / bespoke prefs (renderer, alternate_surface, defaultRuntime,
@@ -84,6 +92,10 @@ private val EXPERIMENTAL_BOOLS = listOf(
     BoolPref("dump_shaders", "Dump shaders", false),
     BoolPref("bigCoreAffinity", "Big-core affinity", false),
 )
+private val SERVER_STRINGS = listOf(
+    StringPref("serverIp",   "Server IP address", "127.0.0.1"),
+    StringPref("serverPort", "Server port",       "43595", KeyboardType.Number),
+)
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
 class SettingsActivity : BaseActivity() {
@@ -126,6 +138,9 @@ private fun SettingsScreen(
                     Text("Settings", style = MaterialTheme.typography.headlineSmall)
                 }
             }
+            section("Server") {
+                SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
+            }
             prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
             prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)
             item { TextButton(onClick = onOpenControls) { Text("Edit on-screen controls…") } }
@@ -157,6 +172,14 @@ private fun LazyListScope.prefSection(
     items(ints) { IntRow(it, repo) }
 }
 
+private fun LazyListScope.section(title: String, content: LazyListScope.() -> Unit) {
+    item {
+        Spacer(Modifier.height(12.dp))
+        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    }
+    content()
+}
+
 @Composable
 private fun BoolRow(pref: BoolPref, repo: PreferencesRepository) {
     var checked by remember { mutableStateOf(repo.getBoolean(pref.key, pref.def)) }
@@ -182,6 +205,24 @@ private fun IntRow(pref: IntPref, repo: PreferencesRepository) {
             onValueChange = { value = it.toInt() },
             onValueChangeFinished = { repo.putInt(pref.key, value) },
             valueRange = pref.range.first.toFloat()..pref.range.last.toFloat(),
+        )
+    }
+}
+
+@Composable
+private fun StringRow(pref: StringPref, repo: PreferencesRepository) {
+    var value by remember { mutableStateOf(repo.getString(pref.key, pref.def) ?: pref.def) }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(pref.label, modifier = Modifier.weight(1f))
+        OutlinedTextField(
+            value = value,
+            onValueChange = { value = it; repo.putString(pref.key, it) },
+            modifier = Modifier.width(180.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = pref.keyboardType),
         )
     }
 }
