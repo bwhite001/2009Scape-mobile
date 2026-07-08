@@ -169,7 +169,14 @@ public final class Tools {
             org.json.JSONObject json = new org.json.JSONObject(raw);
             json.put("ip_address",    ip);
             json.put("ip_management", ip);
-            int portInt = Integer.parseInt(port);
+            if (port == null || port.trim().isEmpty()) port = "43595";
+            int portInt;
+            try {
+                portInt = Integer.parseInt(port.trim());
+            } catch (NumberFormatException e) {
+                portInt = 43595;
+                android.util.Log.w("Tools", "patchConfigJson: invalid port '" + port + "', using 43595");
+            }
             json.put("server_port", portInt - 1); // server_port in config is worldId-based (43594 for world 1)
             json.put("wl_port",     portInt);
             json.put("js5_port",    portInt);

@@ -27,9 +27,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.kdt.pojavlaunch.customcontrols.CustomControlsActivity
 import net.kdt.pojavlaunch.di.PreferencesRepository
@@ -37,7 +39,12 @@ import net.kdt.pojavlaunch.ui.theme.LauncherTheme
 
 private data class BoolPref(val key: String, val label: String, val def: Boolean)
 private data class IntPref(val key: String, val label: String, val def: Int, val range: IntRange)
-private data class StringPref(val key: String, val label: String, val def: String)
+private data class StringPref(
+    val key: String,
+    val label: String,
+    val def: String,
+    val keyboardType: KeyboardType = KeyboardType.Text,
+)
 
 // Simple, safe-to-model preferences (exact SharedPreferences keys preserved).
 // GL-critical / bespoke prefs (renderer, alternate_surface, defaultRuntime,
@@ -87,7 +94,7 @@ private val EXPERIMENTAL_BOOLS = listOf(
 )
 private val SERVER_STRINGS = listOf(
     StringPref("serverIp",   "Server IP address", "127.0.0.1"),
-    StringPref("serverPort", "Server port",       "43595"),
+    StringPref("serverPort", "Server port",       "43595", KeyboardType.Number),
 )
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
@@ -215,6 +222,7 @@ private fun StringRow(pref: StringPref, repo: PreferencesRepository) {
             onValueChange = { value = it; repo.putString(pref.key, it) },
             modifier = Modifier.width(180.dp),
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = pref.keyboardType),
         )
     }
 }
