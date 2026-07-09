@@ -121,6 +121,9 @@ public class GLFWGLSurface extends View implements GrabListener {
     /* True from the moment a long-press right-click fires until the next finger-down.
        While true, moves must NOT pan the camera (issue #22). */
     private boolean mLongPressFired = false;
+    /* True while a one-finger click-drag is in progress in a menu (non-grabbed),
+       so scrollbars/sliders can be dragged (issues #25, #30). */
+    private boolean mMenuDragging = false;
     /* Handle hotbar throw button and mouse mining button */
     public static final int MSG_LEFT_MOUSE_BUTTON_CHECK = 1028;
     public static final int MSG_DROP_ITEM_BUTTON_CHECK = 1029;
@@ -276,7 +279,7 @@ public class GLFWGLSurface extends View implements GrabListener {
             CallbackBridge.mouseX = (e.getX() * mScaleFactor);
             CallbackBridge.mouseY = (e.getY() * mScaleFactor);
             //One android click = one MC click
-            if(mSingleTapDetector.onTouchEvent(e)){ //
+            if(mSingleTapDetector.onTouchEvent(e) && !mMenuDragging){ //
                 int tapButton = LauncherPreferences.PREF_SINGLE_TAP_RIGHTCLICK
                         ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
                         : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
@@ -315,8 +318,18 @@ public class GLFWGLSurface extends View implements GrabListener {
                 // In-menu interactions
                 if(!CallbackBridge.isGrabbing()){
 
-                    // Touch hover
+                    // Touch hover / one-finger click-drag (for scrollbars, sliders)
                     if(pointerCount == 1){
+                        CallbackBridge.mouseX = (e.getX() * mScaleFactor);
+                        CallbackBridge.mouseY = (e.getY() * mScaleFactor);
+
+                        // Once the finger has moved past the still-threshold, treat it as a
+                        // held left-button drag so the client can drag scrollbars/sliders.
+                        if(!mMenuDragging &&
+                                MathUtils.dist(e.getX(), e.getY(), mInitialX, mInitialY) >= FINGER_STILL_THRESHOLD){
+                            mMenuDragging = true;
+                            sendMouseButton(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, true);
+                        }
                         CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
                         mPrevX =  e.getX();
                         mPrevY =  e.getY();
@@ -384,6 +397,8 @@ public class GLFWGLSurface extends View implements GrabListener {
                 CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
                 mPrevX =  e.getX();
                 mPrevY =  e.getY();
+                mInitialX = e.getX();
+                mInitialY = e.getY();
 
                 if (CallbackBridge.isGrabbing()) {
                     mCurrentPointerID = e.getPointerId(0);
@@ -396,11 +411,19 @@ public class GLFWGLSurface extends View implements GrabListener {
                 break;
 
             case MotionEvent.ACTION_UP: // 1
+                if(mMenuDragging){
+                    sendMouseButton(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, false);
+                    mMenuDragging = false;
+                }
                 // End of drag, reset the start position
                 startX = 0;
                 startY = 0;
                 break;
             case MotionEvent.ACTION_CANCEL: // 3
+                if(mMenuDragging){
+                    sendMouseButton(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, false);
+                    mMenuDragging = false;
+                }
                 mShouldBeDown = false;
                 mCurrentPointerID = -1;
 
