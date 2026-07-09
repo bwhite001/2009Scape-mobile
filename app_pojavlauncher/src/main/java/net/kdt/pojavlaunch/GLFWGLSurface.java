@@ -124,6 +124,9 @@ public class GLFWGLSurface extends View implements GrabListener {
     /* True while a one-finger click-drag is in progress in a menu (non-grabbed),
        so scrollbars/sliders can be dragged (issues #25, #30). */
     private boolean mMenuDragging = false;
+    /* GLFW button chosen at stylus-down, reused at stylus-up so barrel-button
+       right-clicks release the same button they pressed (issue #31). */
+    private int mStylusButton = LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
     /* Handle hotbar throw button and mouse mining button */
     public static final int MSG_LEFT_MOUSE_BUTTON_CHECK = 1028;
     public static final int MSG_DROP_ITEM_BUTTON_CHECK = 1029;
@@ -276,16 +279,16 @@ public class GLFWGLSurface extends View implements GrabListener {
             // A stylus tip touching the screen has no ACTION_BUTTON_* events, so map its
             // down/up here to a left click (barrel button -> right click). (issue #31)
             if(toolType == MotionEvent.TOOL_TYPE_STYLUS){
-                boolean barrel = (e.getButtonState()
-                        & (MotionEvent.BUTTON_STYLUS_PRIMARY | MotionEvent.BUTTON_SECONDARY)) != 0;
-                int glfwButton = barrel
-                        ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
-                        : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
                 int action = e.getActionMasked();
                 if(action == MotionEvent.ACTION_DOWN){
-                    sendMouseButton(glfwButton, true);
+                    boolean barrel = (e.getButtonState()
+                            & (MotionEvent.BUTTON_STYLUS_PRIMARY | MotionEvent.BUTTON_SECONDARY)) != 0;
+                    mStylusButton = barrel
+                            ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
+                            : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
+                    sendMouseButton(mStylusButton, true);
                 } else if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL){
-                    sendMouseButton(glfwButton, false);
+                    sendMouseButton(mStylusButton, false);
                 }
             }
             return true; // pointer event handled
