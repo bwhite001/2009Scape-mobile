@@ -318,6 +318,14 @@ public class GLFWGLSurface extends View implements GrabListener {
                 // In-menu interactions
                 if(!CallbackBridge.isGrabbing()){
 
+                    // A second finger arrived mid-drag: end the one-finger held drag
+                    // before handling two-finger scroll, so scroll never runs with the
+                    // left button still held.
+                    if(mMenuDragging && pointerCount != 1){
+                        sendMouseButton(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, false);
+                        mMenuDragging = false;
+                    }
+
                     // Touch hover / one-finger click-drag (for scrollbars, sliders)
                     if(pointerCount == 1){
                         CallbackBridge.mouseX = (e.getX() * mScaleFactor);
