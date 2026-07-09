@@ -118,6 +118,9 @@ public class GLFWGLSurface extends View implements GrabListener {
     public static final int FINGER_SCROLL_THRESHOLD = (int) Tools.dpToPx(6);
     /* Whether the button was triggered, used by the handler */
     private static boolean triggeredLeftMouseButton = false;
+    /* True from the moment a long-press right-click fires until the next finger-down.
+       While true, moves must NOT pan the camera (issue #22). */
+    private boolean mLongPressFired = false;
     /* Handle hotbar throw button and mouse mining button */
     public static final int MSG_LEFT_MOUSE_BUTTON_CHECK = 1028;
     public static final int MSG_DROP_ITEM_BUTTON_CHECK = 1029;
@@ -230,6 +233,7 @@ public class GLFWGLSurface extends View implements GrabListener {
                     if (LauncherPreferences.PREF_SINGLE_TAP_RIGHTCLICK) return;
                     Haptics.vibrate(getContext(), Haptics.LONG_PRESS_MS);
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT, CallbackBridge.mouseX, CallbackBridge.mouseY);
+                    mLongPressFired = true;
                 }
             });
 
@@ -291,11 +295,14 @@ public class GLFWGLSurface extends View implements GrabListener {
                 float dx = (e.getX()) - startX;
                 float dy = (e.getY()) - startY;
 
-                // Do something with dx and dy here, like adjusting the camera position
-                try {
-                    panCamera(dx, dy);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
+                // Do not pan the camera while a long-press context menu is up (issue #22),
+                // and only pan with a single finger.
+                if (!mLongPressFired && e.getPointerCount() == 1) {
+                    try {
+                        panCamera(dx, dy);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
 
                 // Update start position
@@ -356,6 +363,7 @@ public class GLFWGLSurface extends View implements GrabListener {
                 break;
 
             case MotionEvent.ACTION_DOWN: // 0
+                mLongPressFired = false;
                 startX = e.getX();
                 startY = e.getY();
                 hudKeyHandled = handleGuiBar((int)e.getX(), (int) e.getY());
@@ -424,7 +432,6 @@ public class GLFWGLSurface extends View implements GrabListener {
 
         // Actualise the pointer count
         mLastPointerCount = e.getPointerCount();
-        longPressDetector.onTouchEvent(e);
 
         return true;
     }
