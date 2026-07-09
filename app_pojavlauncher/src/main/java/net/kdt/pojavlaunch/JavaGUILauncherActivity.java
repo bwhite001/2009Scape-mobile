@@ -379,8 +379,14 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if(event.getAction() == KeyEvent.ACTION_DOWN){
-            KeyEncoder.sendEncodedChar(event.getKeyCode(),(char)event.getUnicodeChar());
+        int keyCode = event.getKeyCode();
+        // Let the OS handle media-volume changes (matches the HD path in
+        // GLFWGLSurface.processKeyEvent) instead of swallowing them.
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            return super.dispatchKeyEvent(event);
+        }
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            KeyEncoder.sendEncodedChar(event.getKeyCode(), (char) event.getUnicodeChar());
         }
         return true;
     }
