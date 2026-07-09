@@ -501,6 +501,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             MainActivity.mControlLayout.setModifiable(false);
             System.gc();
             MainActivity.mControlLayout.loadLayout(LauncherPreferences.PREF_DEFAULTCTRL_PATH);
+            mControlLayout.setMouseButtonsVisible(false);
             mDrawerPullButton.setVisibility(mControlLayout.hasMenuButton() ? View.GONE : View.VISIBLE);
         } catch (IOException e) {
             Tools.showError(this,e);
