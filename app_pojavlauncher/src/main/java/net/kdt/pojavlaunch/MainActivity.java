@@ -52,6 +52,7 @@ import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.EfficientAndroidLWJGLKeycode;
 import net.kdt.pojavlaunch.utils.LwjglGlfwKeycode;
 import net.kdt.pojavlaunch.utils.MCOptionUtils;
+import net.kdt.pojavlaunch.utils.SoftKeyboardViewportShifter;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -114,6 +115,10 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         MCOptionUtils.MCOptionListener optionListener = MCOptionUtils::getMcScale;
         MCOptionUtils.addMCOptionListener(optionListener);
         mControlLayout.setModifiable(false);
+
+        // Shift the whole game view up when the soft keyboard appears so the chat line
+        // stays visible above it (activity is windowSoftInputMode="adjustNothing").
+        SoftKeyboardViewportShifter.attach(this, findViewById(android.R.id.content));
     }
 
     protected void initLayout(int resId) {

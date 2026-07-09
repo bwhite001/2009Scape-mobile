@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Process;
@@ -13,6 +14,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.ServiceCompat;
 import androidx.core.content.ContextCompat;
 
 import net.kdt.pojavlaunch.R;
@@ -62,7 +64,13 @@ public class ProgressService extends Service implements TaskCountListener {
         }
         Log.d("ProgressService", "Started!");
         mNotificationBuilder.setContentText(getString(R.string.progresslayout_tasks_in_progress, ProgressKeeper.getTaskCount()));
-        startForeground(1, mNotificationBuilder.build());
+        // API 34+ requires a foregroundServiceType both in the manifest and here, or
+        // startForeground() throws MissingForegroundServiceTypeException. ServiceCompat
+        // routes to the plain startForeground() on older APIs where the type is ignored.
+        ServiceCompat.startForeground(this, 1, mNotificationBuilder.build(),
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                        ? ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                        : 0);
         if(ProgressKeeper.getTaskCount() < 1) stopSelf();
         else ProgressKeeper.addTaskCountListener(this, false);
 

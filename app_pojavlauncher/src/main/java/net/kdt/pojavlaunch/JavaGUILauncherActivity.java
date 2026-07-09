@@ -33,6 +33,7 @@ import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 import net.kdt.pojavlaunch.utils.JREUtils;
 import net.kdt.pojavlaunch.utils.KeyEncoder;
 import net.kdt.pojavlaunch.utils.MathUtils;
+import net.kdt.pojavlaunch.utils.SoftKeyboardViewportShifter;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -58,6 +59,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
     private long lastPress = 0;
     private ScaleGestureDetector scaleGestureDetector;
     private boolean rcState = false;
+    private boolean mMapDragging = false;
     private boolean mSkipDetectMod;
     private static boolean mIsVirtualMouseEnabled;
 
@@ -78,6 +80,10 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         MainActivity.GLOBAL_CLIPBOARD = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         mTouchCharInput = findViewById(R.id.awt_touch_char);
         mTouchCharInput.setCharacterSender(new AwtCharSender());
+
+        // Shift the whole game view up when the soft keyboard appears so the chat line
+        // stays visible above it (activity is windowSoftInputMode="adjustNothing").
+        SoftKeyboardViewportShifter.attach(this, findViewById(android.R.id.content));
 
         findViewById(R.id.mouseMode).setOnTouchListener(this);
         findViewById(R.id.keyboard).setOnTouchListener(this);
@@ -162,6 +168,40 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         mTextureView.setOnTouchListener((v, event) -> {
             scaleGestureDetector.onTouchEvent(event);
             longPressDetector.onTouchEvent(event);
+
+            int action = event.getActionMasked();
+
+            // Two-finger drag => a real held left-button click-drag, so the RS world map
+            // (which only scrolls while a mouse button is held) can be panned. One-finger
+            // drag still pans the camera via arrow keys; pinch still zooms.
+            if (event.getPointerCount() >= 2) {
+                float cx = (event.getX(0) + event.getX(1)) / 2f;
+                float cy = (event.getY(0) + event.getY(1)) / 2f;
+                switch (action) {
+                    case MotionEvent.ACTION_POINTER_DOWN: // second finger down: start drag
+                        sendScaledMousePosition(cx + mTextureView.getX(), cy);
+                        AWTInputBridge.sendMousePress(AWTInputEvent.BUTTON1_DOWN_MASK, true);
+                        mMapDragging = true;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (mMapDragging) sendScaledMousePosition(cx + mTextureView.getX(), cy);
+                        break;
+                }
+                prevX = event.getX(0);
+                prevY = event.getY(0);
+                return true;
+            }
+
+            // A finger lifted, ending a two-finger drag: release the held button.
+            if (mMapDragging && (action == MotionEvent.ACTION_POINTER_UP
+                    || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)) {
+                AWTInputBridge.sendMousePress(AWTInputEvent.BUTTON1_DOWN_MASK, false);
+                mMapDragging = false;
+                prevX = event.getX();
+                prevY = event.getY();
+                return true;
+            }
+
             float x = event.getX();
             float y = event.getY();
             if (mGestureDetector.onTouchEvent(event)) {
@@ -173,7 +213,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
                 return true;
             }
 
-            switch (event.getActionMasked()) {
+            switch (action) {
                 case MotionEvent.ACTION_UP: // 1
                 case MotionEvent.ACTION_CANCEL: // 3
                 case MotionEvent.ACTION_POINTER_UP: // 6
