@@ -2,6 +2,7 @@ package net.kdt.pojavlaunch
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -92,9 +93,12 @@ private val EXPERIMENTAL_BOOLS = listOf(
     BoolPref("dump_shaders", "Dump shaders", false),
     BoolPref("bigCoreAffinity", "Big-core affinity", false),
 )
+private const val DEFAULT_CONFIG_URL = "http://192.168.0.243:8080/config.json"
+
 private val SERVER_STRINGS = listOf(
     StringPref("serverIp",   "Server IP address", "127.0.0.1"),
     StringPref("serverPort", "Server port",       "43595", KeyboardType.Number),
+    StringPref("serverConfigUrl", "Config import URL", DEFAULT_CONFIG_URL),
 )
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
@@ -109,6 +113,7 @@ class SettingsActivity : BaseActivity() {
                     onBack = { finish() },
                     onOpenControls = { startActivity(Intent(this, CustomControlsActivity::class.java)) },
                     onOpenAdvanced = { MyDialogFragment().show(supportFragmentManager, "advanced") },
+                    onImportConfig = { importServerConfig(repo) },
                 )
             }
         }
@@ -120,6 +125,50 @@ class SettingsActivity : BaseActivity() {
         // of on every write (which ran a full filesystem prefs reload per keystroke).
         PojavApplication.appContainer.preferencesRepository.reloadLauncherPreferences()
     }
+
+    /**
+     * Fetch a server config.json (e.g. the one hosted on the LAN web root) and
+     * OVERRIDE the serverIp / serverPort preferences from it. Runs off the UI
+     * thread; recreates the screen on success so the fields show the new values.
+     */
+    private fun importServerConfig(repo: PreferencesRepository) {
+        val url = repo.getString("serverConfigUrl", DEFAULT_CONFIG_URL)?.trim().orEmpty()
+        if (url.isEmpty()) {
+            Toast.makeText(this, "Set a config import URL first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        Toast.makeText(this, "Importing config from $url…", Toast.LENGTH_SHORT).show()
+        Thread {
+            try {
+                val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 5000
+                    readTimeout = 5000
+                    requestMethod = "GET"
+                }
+                val body = conn.inputStream.bufferedReader().use { it.readText() }
+                conn.disconnect()
+                val json = org.json.JSONObject(body)
+                val ip = json.optString("ip_address", json.optString("ip_management", ""))
+                if (ip.isEmpty()) throw IllegalStateException("config has no ip_address")
+                val port = when {
+                    json.has("wl_port")     -> json.getInt("wl_port")
+                    json.has("js5_port")    -> json.getInt("js5_port")
+                    json.has("server_port") -> json.getInt("server_port")
+                    else -> 43595
+                }
+                repo.putString("serverIp", ip)
+                repo.putString("serverPort", port.toString())
+                runOnUiThread {
+                    Toast.makeText(this, "Imported $ip:$port — IP/port overridden", Toast.LENGTH_LONG).show()
+                    recreate()
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }.start()
+    }
 }
 
 @Composable
@@ -128,6 +177,7 @@ private fun SettingsScreen(
     onBack: () -> Unit,
     onOpenControls: () -> Unit,
     onOpenAdvanced: () -> Unit,
+    onImportConfig: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -140,6 +190,11 @@ private fun SettingsScreen(
             }
             section("Server") {
                 SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
+                item {
+                    TextButton(onClick = onImportConfig) {
+                        Text("Import config from URL (overrides IP/port)")
+                    }
+                }
             }
             prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
             prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)

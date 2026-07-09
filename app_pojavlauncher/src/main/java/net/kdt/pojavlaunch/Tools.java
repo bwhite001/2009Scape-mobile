@@ -189,6 +189,14 @@ public final class Tools {
             try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
                 fw.write(json.toString(2));
             }
+
+            // Read-back so the device log shows exactly what the client will dial.
+            String readback = "config.json -> ip=" + ip
+                    + " server_port=" + portInt
+                    + " wl_port=" + portInt
+                    + " js5_port=" + portInt;
+            android.util.Log.i("Tools", readback);
+            try { Logger.appendToLog("[launcher] " + readback); } catch (Throwable ignored) {}
         } catch (Exception e) {
             android.util.Log.w("Tools", "patchConfigJson failed: " + e.getMessage());
         }
