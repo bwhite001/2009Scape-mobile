@@ -13,15 +13,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,7 +30,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.kdt.pojavlaunch.di.ProgressUiState
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
 import net.kdt.pojavlaunch.services.ProgressServiceKeeper
+import net.kdt.pojavlaunch.ui.rs.RsButton
+import net.kdt.pojavlaunch.ui.rs.RsLink
+import net.kdt.pojavlaunch.ui.rs.RsPanel
+import net.kdt.pojavlaunch.ui.rs.ScapeLogo
 import net.kdt.pojavlaunch.ui.theme.LauncherTheme
+import net.kdt.pojavlaunch.ui.theme.RsColors
 
 /**
  * Launcher home screen (Compose). Play HD -> MainActivity (GL), Play SD ->
@@ -97,25 +100,31 @@ private fun HomeScreen(
     onPlaySd: () -> Unit,
     onSettings: () -> Unit,
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(color = RsColors.bgDeep, modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(text = "2009Scape", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(24.dp))
-            Button(onClick = onPlayHd, modifier = Modifier.width(220.dp)) { Text("Play HD") }
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = onPlaySd, modifier = Modifier.width(220.dp)) { Text("Play SD") }
-            Spacer(Modifier.height(12.dp))
-            TextButton(onClick = onSettings) { Text("Settings") }
-            if (progress.isBusy) {
-                Spacer(Modifier.height(24.dp))
-                LinearProgressIndicator(modifier = Modifier.width(220.dp))
-                if (progress.messageResId != 0) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(text = stringResource(progress.messageResId))
+            RsPanel(modifier = Modifier.widthIn(max = 420.dp)) {
+                ScapeLogo()
+                Spacer(Modifier.height(20.dp))
+                RsButton("Play HD", onClick = onPlayHd)
+                Spacer(Modifier.height(8.dp))
+                RsButton("Play SD", onClick = onPlaySd)
+                Spacer(Modifier.height(10.dp))
+                RsLink("Settings", onClick = onSettings)
+                if (progress.isBusy) {
+                    Spacer(Modifier.height(16.dp))
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = RsColors.borderLight,
+                        trackColor = RsColors.borderDark,
+                    )
+                    if (progress.messageResId != 0) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(text = stringResource(progress.messageResId), color = RsColors.textMuted)
+                    }
                 }
             }
         }
