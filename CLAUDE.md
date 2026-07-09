@@ -35,7 +35,7 @@ If you're changing *what game runs or how it connects*, it's one of these files.
 Gradle project, **two modules** with **different Java levels** (see `gradle.properties` `configureondemand` note):
 
 - **`jre_lwjgl3glfw`** — builds with **JDK 8**. A reimplementation of the LWJGL 2 API on top of LWJGL 3 / GLFW so the old client can run on the mobile GL stack. Its `jar` task writes `lwjgl-glfw-classes.jar` + a `version` stamp directly into `app_pojavlauncher/src/main/assets/components/lwjgl3/` — i.e. building this module *produces an app asset*.
-- **`app_pojavlauncher`** — the Android app (`namespace net.kdt.pojavlaunch`, `compileSdk 33`, `minSdk 21`), builds with **JDK 17** + Android Gradle Plugin 7.4.2, Gradle 7.6.1.
+- **`app_pojavlauncher`** — the Android app (`namespace net.kdt.pojavlaunch`, `compileSdk 35`, `minSdk 21`), builds with **JDK 17** + Android Gradle Plugin 8.7.3, Gradle 8.9.
 
 CI (`.github/workflows/android.yml`) is the canonical build recipe. Replicate it locally:
 

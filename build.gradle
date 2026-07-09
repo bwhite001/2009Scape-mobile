@@ -1,1 +1,18 @@
+// This project has no single "build everything" task because its two modules
+// require different JDKs (see BUILDING.md). A bare `gradlew` run lists tasks
+// and points the user at the docs instead of silently doing nothing.
+defaultTasks 'buildHelp'
 
+tasks.register('buildHelp') {
+    group = 'help'
+    description = 'Explains how to build the APK (see BUILDING.md).'
+    doLast {
+        println ''
+        println 'To build a debug APK (see BUILDING.md for details):'
+        println '  1. (JDK 8)  ./gradlew :jre_lwjgl3glfw:build'
+        println '  2. (JDK 17) ./gradlew :app_pojavlauncher:assembleDebug'
+        println ''
+        println 'APK -> app_pojavlauncher/build/outputs/apk/debug/app_pojavlauncher-debug.apk'
+        println ''
+    }
+}
