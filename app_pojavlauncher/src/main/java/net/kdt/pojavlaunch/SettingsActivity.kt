@@ -1,9 +1,11 @@
 package net.kdt.pojavlaunch
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -103,6 +105,13 @@ private val SERVER_STRINGS = listOf(
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
 class SettingsActivity : BaseActivity() {
+    // File picker for "Load config.json from file". Registered as a field so it is
+    // available before the activity is STARTED (Activity Result API requirement).
+    private val pickConfigFile =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            if (uri != null) applyConfigFromUri(uri)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val repo = PojavApplication.appContainer.preferencesRepository
@@ -114,6 +123,9 @@ class SettingsActivity : BaseActivity() {
                     onOpenControls = { startActivity(Intent(this, CustomControlsActivity::class.java)) },
                     onOpenAdvanced = { MyDialogFragment().show(supportFragmentManager, "advanced") },
                     onImportConfig = { importServerConfig(repo) },
+                    onPickConfigFile = {
+                        pickConfigFile.launch(arrayOf("application/json", "text/plain", "*/*"))
+                    },
                 )
             }
         }
@@ -147,19 +159,9 @@ class SettingsActivity : BaseActivity() {
                 }
                 val body = conn.inputStream.bufferedReader().use { it.readText() }
                 conn.disconnect()
-                val json = org.json.JSONObject(body)
-                val ip = json.optString("ip_address", json.optString("ip_management", ""))
-                if (ip.isEmpty()) throw IllegalStateException("config has no ip_address")
-                val port = when {
-                    json.has("wl_port")     -> json.getInt("wl_port")
-                    json.has("js5_port")    -> json.getInt("js5_port")
-                    json.has("server_port") -> json.getInt("server_port")
-                    else -> 43595
-                }
-                repo.putString("serverIp", ip)
-                repo.putString("serverPort", port.toString())
+                val result = applyConfigJson(repo, body)
                 runOnUiThread {
-                    Toast.makeText(this, "Imported $ip:$port — IP/port overridden", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Imported $result — IP/port overridden", Toast.LENGTH_LONG).show()
                     recreate()
                 }
             } catch (e: Exception) {
@@ -168,6 +170,45 @@ class SettingsActivity : BaseActivity() {
                 }
             }
         }.start()
+    }
+
+    /**
+     * Read a config.json picked from device storage and OVERRIDE serverIp /
+     * serverPort from it. Runs on the UI thread (result callback); the read is a
+     * small local file so it does not need a background thread.
+     */
+    private fun applyConfigFromUri(uri: Uri) {
+        val repo = PojavApplication.appContainer.preferencesRepository
+        try {
+            val body = contentResolver.openInputStream(uri)
+                ?.bufferedReader()?.use { it.readText() }
+                ?: throw IllegalStateException("could not read file")
+            val result = applyConfigJson(repo, body)
+            Toast.makeText(this, "Loaded $result — IP/port overridden", Toast.LENGTH_LONG).show()
+            recreate()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Load failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Parse a server config.json body and write serverIp / serverPort prefs from
+     * ip_address + wl/js5/server port. Returns "ip:port"; throws on bad data.
+     * Shared by both the URL import and the file-picker import.
+     */
+    private fun applyConfigJson(repo: PreferencesRepository, body: String): String {
+        val json = org.json.JSONObject(body)
+        val ip = json.optString("ip_address", json.optString("ip_management", ""))
+        if (ip.isEmpty()) throw IllegalStateException("config has no ip_address")
+        val port = when {
+            json.has("wl_port")     -> json.getInt("wl_port")
+            json.has("js5_port")    -> json.getInt("js5_port")
+            json.has("server_port") -> json.getInt("server_port")
+            else -> 43595
+        }
+        repo.putString("serverIp", ip)
+        repo.putString("serverPort", port.toString())
+        return "$ip:$port"
     }
 }
 
@@ -178,6 +219,7 @@ private fun SettingsScreen(
     onOpenControls: () -> Unit,
     onOpenAdvanced: () -> Unit,
     onImportConfig: () -> Unit,
+    onPickConfigFile: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -193,6 +235,11 @@ private fun SettingsScreen(
                 item {
                     TextButton(onClick = onImportConfig) {
                         Text("Import config from URL (overrides IP/port)")
+                    }
+                }
+                item {
+                    TextButton(onClick = onPickConfigFile) {
+                        Text("Load config.json from file (overrides IP/port)")
                     }
                 }
             }
