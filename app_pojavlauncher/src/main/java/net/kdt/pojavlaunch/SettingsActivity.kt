@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,32 +15,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.kdt.pojavlaunch.customcontrols.CustomControlsActivity
 import net.kdt.pojavlaunch.di.PreferencesRepository
+import net.kdt.pojavlaunch.ui.rs.RsBackButton
+import net.kdt.pojavlaunch.ui.rs.RsButton
+import net.kdt.pojavlaunch.ui.rs.RsHeaderBand
+import net.kdt.pojavlaunch.ui.rs.RsSectionHeader
+import net.kdt.pojavlaunch.ui.rs.RsSlider
+import net.kdt.pojavlaunch.ui.rs.RsToggle
 import net.kdt.pojavlaunch.ui.theme.LauncherTheme
+import net.kdt.pojavlaunch.ui.theme.RsColors
 
 private data class BoolPref(val key: String, val label: String, val def: Boolean)
 private data class IntPref(val key: String, val label: String, val def: Int, val range: IntRange)
@@ -65,6 +69,7 @@ private val CONTROL_BOOLS = listOf(
     BoolPref("disableGestures", "Disable gestures", false),
     BoolPref("disableDoubleTap", "Disable double-tap to swap hands", false),
     BoolPref("singleTapRightClick", "Single-tap opens right-click menu", false),
+    BoolPref("haptic", "Haptic feedback", true),
     BoolPref("mouse_start", "Start with virtual mouse enabled", false),
     BoolPref("buttonAllCaps", "Uppercase button labels", true),
     BoolPref("enableGyro", "Enable gyro aiming", false),
@@ -221,40 +226,46 @@ private fun SettingsScreen(
     onImportConfig: () -> Unit,
     onPickConfigFile: () -> Unit,
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = onBack) { Text("Back") }
-                    Spacer(Modifier.width(8.dp))
-                    Text("Settings", style = MaterialTheme.typography.headlineSmall)
-                }
+    Surface(color = RsColors.bgDeep, modifier = Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .background(RsColors.borderDark)
+                .padding(1.dp)
+                .background(RsColors.borderLight)
+                .padding(2.dp)
+                .background(RsColors.borderDark)
+                .padding(1.dp)
+                .background(RsColors.bgPanel),
+        ) {
+            RsHeaderBand("Settings")
+            Row(
+                Modifier.fillMaxWidth().padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RsBackButton(onClick = onBack)
             }
-            section("Server") {
-                SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
-                item {
-                    TextButton(onClick = onImportConfig) {
-                        Text("Import config from URL (overrides IP/port)")
-                    }
+            LazyColumn(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp)) {
+                section("Server") {
+                    SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
+                    item { Spacer(Modifier.height(8.dp)); RsButton("Import config from URL", onClick = onImportConfig, muted = true) }
+                    item { Spacer(Modifier.height(6.dp)); RsButton("Load config.json from file", onClick = onPickConfigFile, muted = true) }
                 }
+                prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
+                prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)
+                item { Spacer(Modifier.height(8.dp)); RsButton("Edit on-screen controls", onClick = onOpenControls, muted = true) }
+                prefSection("Java", JAVA_BOOLS, JAVA_INTS, repo)
+                item { JavaArgsRow(repo) }
+                prefSection("Misc", MISC_BOOLS, emptyList(), repo)
+                prefSection("Experimental", EXPERIMENTAL_BOOLS, emptyList(), repo)
                 item {
-                    TextButton(onClick = onPickConfigFile) {
-                        Text("Load config.json from file (overrides IP/port)")
-                    }
+                    RsSectionHeader("Advanced")
+                    Text("Renderer, runtime, plugins, and imports", color = RsColors.textMuted)
+                    Spacer(Modifier.height(8.dp))
+                    RsButton("Open advanced settings", onClick = onOpenAdvanced, muted = true)
+                    Spacer(Modifier.height(20.dp))
                 }
-            }
-            prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
-            prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)
-            item { TextButton(onClick = onOpenControls) { Text("Edit on-screen controls…") } }
-            prefSection("Java", JAVA_BOOLS, JAVA_INTS, repo)
-            item { JavaArgsRow(repo) }
-            prefSection("Misc", MISC_BOOLS, emptyList(), repo)
-            prefSection("Experimental", EXPERIMENTAL_BOOLS, emptyList(), repo)
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("Advanced", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("Renderer, runtime, plugins, and imports")
-                TextButton(onClick = onOpenAdvanced) { Text("Open advanced settings…") }
             }
         }
     }
@@ -266,19 +277,13 @@ private fun LazyListScope.prefSection(
     ints: List<IntPref>,
     repo: PreferencesRepository,
 ) {
-    item {
-        Spacer(Modifier.height(12.dp))
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-    }
+    item { RsSectionHeader(title) }
     items(bools) { BoolRow(it, repo) }
     items(ints) { IntRow(it, repo) }
 }
 
 private fun LazyListScope.section(title: String, content: LazyListScope.() -> Unit) {
-    item {
-        Spacer(Modifier.height(12.dp))
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-    }
+    item { RsSectionHeader(title) }
     content()
 }
 
@@ -289,8 +294,8 @@ private fun BoolRow(pref: BoolPref, repo: PreferencesRepository) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(pref.label, modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = {
+        Text(pref.label, color = RsColors.textBody, modifier = Modifier.weight(1f))
+        RsToggle(checked = checked, onCheckedChange = {
             checked = it
             repo.putBoolean(pref.key, it)
         })
@@ -301,30 +306,41 @@ private fun BoolRow(pref: BoolPref, repo: PreferencesRepository) {
 private fun IntRow(pref: IntPref, repo: PreferencesRepository) {
     var value by remember { mutableIntStateOf(repo.getInt(pref.key, pref.def)) }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-        Text("${pref.label}: $value")
-        Slider(
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(pref.label, color = RsColors.textBody)
+            Text("$value", color = RsColors.textBright)
+        }
+        RsSlider(
             value = value.toFloat(),
             onValueChange = { value = it.toInt() },
-            onValueChangeFinished = { repo.putInt(pref.key, value) },
             valueRange = pref.range.first.toFloat()..pref.range.last.toFloat(),
+            onValueChangeFinished = { repo.putInt(pref.key, value) },
         )
     }
+}
+
+private val rsFieldColors: @Composable () -> androidx.compose.material3.TextFieldColors = {
+    OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = RsColors.borderLight,
+        unfocusedBorderColor = RsColors.borderGold,
+        focusedTextColor = RsColors.textBright,
+        unfocusedTextColor = RsColors.textBody,
+        cursorColor = RsColors.borderLight,
+    )
 }
 
 @Composable
 private fun StringRow(pref: StringPref, repo: PreferencesRepository) {
     var value by remember { mutableStateOf(repo.getString(pref.key, pref.def) ?: pref.def) }
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(pref.label, modifier = Modifier.weight(1f))
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Text(pref.label, color = RsColors.textBody)
         OutlinedTextField(
             value = value,
             onValueChange = { value = it; repo.putString(pref.key, it) },
-            modifier = Modifier.width(180.dp),
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = pref.keyboardType),
+            colors = rsFieldColors(),
         )
     }
 }
@@ -333,7 +349,7 @@ private fun StringRow(pref: StringPref, repo: PreferencesRepository) {
 private fun JavaArgsRow(repo: PreferencesRepository) {
     var text by remember { mutableStateOf(repo.getString("javaArgs", "") ?: "") }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-        Text("Custom Java arguments")
+        Text("Custom Java arguments", color = RsColors.textBody)
         OutlinedTextField(
             value = text,
             onValueChange = {
@@ -342,6 +358,7 @@ private fun JavaArgsRow(repo: PreferencesRepository) {
             },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            colors = rsFieldColors(),
         )
     }
 }
