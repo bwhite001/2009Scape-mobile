@@ -442,6 +442,11 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         runtime = MultiRTUtils.forceReread("Internal");
         JREUtils.redirectAndPrintJRELog();
         try {
+            // Apply the user's Settings server IP/port to config.json before launch,
+            // exactly like the HD path (Tools.launchGLJRE) does — otherwise SD mode
+            // ignores the configured server and uses the bundled default.
+            Tools.patchConfigJson(this);
+
             List<String> javaArgList = new ArrayList<>();
             File gamedir = new File(Tools.DIR_DATA);
 

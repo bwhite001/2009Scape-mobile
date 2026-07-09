@@ -154,7 +154,7 @@ public final class Tools {
      * Reads serverIp/serverPort from SharedPreferences and patches the on-disk config.json
      * so the RT4-Client connects to the user's LAN server instead of the bundled default.
      */
-    private static void patchConfigJson(Activity activity) {
+    public static void patchConfigJson(Activity activity) {
         try {
             android.content.SharedPreferences prefs =
                 androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity);
@@ -177,7 +177,12 @@ public final class Tools {
                 portInt = 43595;
                 android.util.Log.w("Tools", "patchConfigJson: invalid port '" + port + "', using 43595");
             }
-            json.put("server_port", portInt - 1); // server_port in config is worldId-based (43594 for world 1)
+            // This server multiplexes login, JS5 and world-list on a single port
+            // (43594 + worldId = 43595 for world 1), so all three must be that same
+            // port. The known-good desktop server_profiles.json uses 43595 for all
+            // three; the previous "portInt - 1" pointed server_port at a dead 43594
+            // and caused error_game_js5connect.
+            json.put("server_port", portInt);
             json.put("wl_port",     portInt);
             json.put("js5_port",    portInt);
 
