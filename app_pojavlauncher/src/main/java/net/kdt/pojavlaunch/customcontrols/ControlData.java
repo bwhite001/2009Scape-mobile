@@ -32,7 +32,8 @@ public class ControlData {
     public static final int SPECIALBTN_SCROLLUP = -7;
     public static final int SPECIALBTN_SCROLLDOWN = -8;
     public static final int SPECIALBTN_MENU = -9;
-    
+    public static final int SPECIALBTN_COMMAND = -10;
+
     private static ControlData[] SPECIAL_BUTTONS;
     private static List<String> SPECIAL_BUTTON_NAME_ARRAY;
 
@@ -93,6 +94,7 @@ public class ControlData {
     private float width;         //Dp instead of Px now
     private float height;        //Dp instead of Px now
     public int[] keycodes;      //Should store up to 4 keys
+    public String commandText;  //For SPECIALBTN_COMMAND: the ::command text to send (e.g. "::bank")
     public float opacity;       //Alpha value from 0 to 1;
     public int bgColor;
     public int strokeColor;
