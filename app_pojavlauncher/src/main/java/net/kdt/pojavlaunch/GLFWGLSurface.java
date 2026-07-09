@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import net.kdt.pojavlaunch.customcontrols.CameraPan;
 import net.kdt.pojavlaunch.customcontrols.ControlLayout;
 import net.kdt.pojavlaunch.customcontrols.gamepad.Gamepad;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
@@ -491,24 +492,20 @@ public class GLFWGLSurface extends View implements GrabListener {
     }
 
     private void panCamera(float dx, float dy) throws InterruptedException {
-        //Log.i("downthecrop-pan","dx: " +dx + " dy: " + dy);
-        final float threshold = 8.0f; // adjust this value as needed to control the sensitivity of the panning
+        // Separate per-axis thresholds; vertical is slightly higher so it feels
+        // matched to horizontal on tall screens (feedback #3). invertY = false keeps
+        // the historical mapping (drag down -> look up).
+        final float thresholdX = 8.0f;
+        final float thresholdY = 10.0f;
+        int[] dirs = CameraPan.directions(dx, dy, thresholdX, thresholdY, false);
 
-        // Check horizontal panning
-        if(dx > threshold) {
-            // Finger moved to the right, pan camera to the right
-            AWTInputBridge.sendKey((char)AWTInputEvent.VK_RIGHT, AWTInputEvent.VK_RIGHT);
-        } else if(dx < -threshold) {
-            AWTInputBridge.sendKey((char)AWTInputEvent.VK_LEFT, AWTInputEvent.VK_LEFT);
+        switch (dirs[0]) {
+            case CameraPan.RIGHT: AWTInputBridge.sendKey((char)AWTInputEvent.VK_RIGHT, AWTInputEvent.VK_RIGHT); break;
+            case CameraPan.LEFT:  AWTInputBridge.sendKey((char)AWTInputEvent.VK_LEFT, AWTInputEvent.VK_LEFT); break;
         }
-
-        // Check vertical panning
-        if(dy > threshold) {
-            // Finger moved down, pan camera up
-            AWTInputBridge.sendKey((char)AWTInputEvent.VK_UP, AWTInputEvent.VK_UP);
-        } else if(dy < -threshold) {
-            // Finger moved up, pan camera down
-            AWTInputBridge.sendKey((char)AWTInputEvent.VK_DOWN, AWTInputEvent.VK_DOWN);
+        switch (dirs[1]) {
+            case CameraPan.UP:   AWTInputBridge.sendKey((char)AWTInputEvent.VK_UP, AWTInputEvent.VK_UP); break;
+            case CameraPan.DOWN: AWTInputBridge.sendKey((char)AWTInputEvent.VK_DOWN, AWTInputEvent.VK_DOWN); break;
         }
     }
 
