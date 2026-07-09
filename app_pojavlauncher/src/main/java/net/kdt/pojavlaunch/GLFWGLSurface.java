@@ -261,14 +261,34 @@ public class GLFWGLSurface extends View implements GrabListener {
             TapIndicatorView.showTap(e.getX(), e.getY());
         }
 
-        // Looking for a mouse to handle, won't have an effect if no mouse exists.
+        // Looking for a mouse or stylus to handle.
         for (int i = 0; i < e.getPointerCount(); i++) {
-            if(e.getToolType(i) != MotionEvent.TOOL_TYPE_MOUSE && e.getToolType(i) != MotionEvent.TOOL_TYPE_STYLUS ) continue;
+            int toolType = e.getToolType(i);
+            if(toolType != MotionEvent.TOOL_TYPE_MOUSE && toolType != MotionEvent.TOOL_TYPE_STYLUS ) continue;
 
-            // Mouse found
-            if(CallbackBridge.isGrabbing()) return false;
-            CallbackBridge.sendCursorPos(   e.getX(i) * mScaleFactor, e.getY(i) * mScaleFactor);
-            return true; //mouse event handled successfully
+            // Move the cursor for both mouse and stylus.
+            if(!CallbackBridge.isGrabbing()){
+                CallbackBridge.mouseX = e.getX(i) * mScaleFactor;
+                CallbackBridge.mouseY = e.getY(i) * mScaleFactor;
+                CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
+            }
+
+            // A stylus tip touching the screen has no ACTION_BUTTON_* events, so map its
+            // down/up here to a left click (barrel button -> right click). (issue #31)
+            if(toolType == MotionEvent.TOOL_TYPE_STYLUS){
+                boolean barrel = (e.getButtonState()
+                        & (MotionEvent.BUTTON_STYLUS_PRIMARY | MotionEvent.BUTTON_SECONDARY)) != 0;
+                int glfwButton = barrel
+                        ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
+                        : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
+                int action = e.getActionMasked();
+                if(action == MotionEvent.ACTION_DOWN){
+                    sendMouseButton(glfwButton, true);
+                } else if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL){
+                    sendMouseButton(glfwButton, false);
+                }
+            }
+            return true; // pointer event handled
         }
 
         // System.out.println("Pre touch, isTouchInHotbar=" + Boolean.toString(isTouchInHotbar) + ", action=" + MotionEvent.actionToString(e.getActionMasked()));
