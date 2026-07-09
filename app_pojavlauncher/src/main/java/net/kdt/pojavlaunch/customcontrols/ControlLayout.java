@@ -224,6 +224,20 @@ public class ControlLayout extends FrameLayout {
 		}
 	}
 
+	/** Show or hide only the on-screen primary/secondary mouse buttons.
+	 *  They are only useful while the virtual-mouse ("mouse mode") is active. */
+	public void setMouseButtonsVisible(boolean visible) {
+		if (mModifiable) return; // don't touch layouts in the controls editor
+		for (ControlInterface button : getButtonChildren()) {
+			int[] keycodes = button.getProperties().keycodes;
+			if (keycodes != null && keycodes.length > 0
+					&& (keycodes[0] == ControlData.SPECIALBTN_MOUSEPRI
+					 || keycodes[0] == ControlData.SPECIALBTN_MOUSESEC)) {
+				((View) button).setVisibility(visible ? View.VISIBLE : View.GONE);
+			}
+		}
+	}
+
 	public void setModifiable(boolean isModifiable) {
 		if(!isModifiable && mModifiable){
 			removeEditWindow();

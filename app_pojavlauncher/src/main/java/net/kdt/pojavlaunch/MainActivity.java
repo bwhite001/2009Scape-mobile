@@ -193,6 +193,8 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         }
         mDrawerPullButton.setVisibility(mControlLayout.hasMenuButton() ? View.GONE : View.VISIBLE);
         mControlLayout.toggleControlVisible();
+        // Mouse mode starts disabled, so the PRI/SEC buttons should start hidden.
+        mControlLayout.setMouseButtonsVisible(false);
     }
 
     @Override
@@ -327,8 +329,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     public static void toggleMouse(Context ctx) {
         if (CallbackBridge.isGrabbing()) return;
 
-        Toast.makeText(ctx, touchpad.switchState()
-                        ? R.string.control_mouseon : R.string.control_mouseoff,
+        boolean mouseOn = touchpad.switchState();
+        mControlLayout.setMouseButtonsVisible(mouseOn);
+        Toast.makeText(ctx, mouseOn ? R.string.control_mouseon : R.string.control_mouseoff,
                 Toast.LENGTH_SHORT).show();
     }
 
