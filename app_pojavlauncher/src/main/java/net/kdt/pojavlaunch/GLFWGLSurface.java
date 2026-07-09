@@ -238,7 +238,7 @@ public class GLFWGLSurface extends View implements GrabListener {
                     // In single-tap-right-click mode a normal tap already opens the menu,
                     // so the long-press right-click is redundant — skip it (and its haptic) entirely.
                     if (LauncherPreferences.PREF_SINGLE_TAP_RIGHTCLICK) return;
-                    Haptics.vibrate(getContext(), Haptics.LONG_PRESS_MS);
+                    Haptics.tick(getContext());
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                     mLongPressFired = true;
                 }

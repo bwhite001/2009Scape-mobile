@@ -153,6 +153,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
                         if (event.getPointerCount() == 2) {
                             // Right-click event when a second finger touches the screen
                             // Simulating right-click by sending GLFW_MOUSE_BUTTON_RIGHT event
+                            net.kdt.pojavlaunch.utils.Haptics.tick(JavaGUILauncherActivity.this);
                             AWTInputBridge.sendKey((char)AWTInputEvent.VK_F11,AWTInputEvent.VK_F11);
                             AWTInputBridge.sendMousePress(AWTInputEvent.BUTTON1_DOWN_MASK);
                         }
@@ -237,6 +238,7 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             @Override
             public void onLongPress(MotionEvent e) {
                 // Send RightClick
+                net.kdt.pojavlaunch.utils.Haptics.tick(JavaGUILauncherActivity.this);
                 AWTInputBridge.sendKey((char)AWTInputEvent.VK_F11,AWTInputEvent.VK_F11);
                 AWTInputBridge.sendMousePress(AWTInputEvent.BUTTON1_DOWN_MASK);
                 super.onLongPress(e);

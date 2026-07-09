@@ -89,6 +89,7 @@ public class Touchpad extends FrameLayout implements GrabListener{
                     // Right-click event when a second finger touches the screen
                     // Simulating right-click by sending GLFW_MOUSE_BUTTON_RIGHT event
                     Log.i("downthecrop","Hi from a rightclick event!");
+                    net.kdt.pojavlaunch.utils.Haptics.tick(getContext());
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 }
 

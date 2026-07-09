@@ -5,6 +5,8 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
+import androidx.preference.PreferenceManager;
+
 /** Minimal one-shot haptic helper for touch interactions. Launcher-side only. */
 public final class Haptics {
     private Haptics() {}
@@ -12,6 +14,20 @@ public final class Haptics {
     /** Default long-press vibration duration in milliseconds.
      *  Intensity becomes a user setting in a later tier (modernisation phase 2d). */
     public static final int LONG_PRESS_MS = 45;
+
+    /** SharedPreferences key for the "Haptic feedback" setting (default on). */
+    public static final String PREF_HAPTIC = "haptic";
+
+    /**
+     * Fire the standard long-press tick, but only when the user's "Haptic
+     * feedback" setting is enabled. Use this at right-click / long-press trigger
+     * sites so a single toggle governs all of them.
+     */
+    public static void tick(Context context) {
+        if (context == null) return;
+        if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_HAPTIC, true)) return;
+        vibrate(context, LONG_PRESS_MS);
+    }
 
     /** Fire a one-shot vibration. No-op when the device has no vibrator or duration <= 0. */
     public static void vibrate(Context context, int durationMs) {
