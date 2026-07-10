@@ -53,7 +53,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 020 | Trivial pure-function unit tests (JSONUtils; isValidString/SHA1 skipped — not testable, see report) | P2 | S | tests | — | DONE |
 | 025 | Bump `material` 1.5.0 → 1.12.0 | P3 | S–M | migration | — | DONE (device smoke PENDING) |
 | 026 | `MultiRTUtils` tar-slip + symlink containment (latent) | P3 | S | security | — | DONE |
-| 027 | INVESTIGATE: in-world cleanup only under ACTION_CANCEL | P3 | S | bug | — | TODO |
+| 027 | INVESTIGATE: in-world cleanup only under ACTION_CANCEL | P3 | S | bug | — | BLOCKED (needs on-device logcat of real ACTION_UP/CANCEL for in-world lift; headless env can't capture it — see task-027-report.md) |
 | 028 | Tune shared `ThreadPoolExecutor` (low leverage) | P3 | S | tech-debt | — | TODO |
 | 029 | SPIKE: server-profile switcher | P2 | M | direction | 018 | TODO |
 | 030 | SPIKE: SHA-256 artifact/config integrity | P2 | L | direction | — | TODO |
