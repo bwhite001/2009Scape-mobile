@@ -34,6 +34,7 @@ import net.kdt.pojavlaunch.extra.ExtraListener;
 import net.kdt.pojavlaunch.prefs.screens.LauncherPreferenceFragment;
 import net.kdt.pojavlaunch.tasks.AsyncAssetManager;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -190,55 +191,84 @@ public class MyDialogFragment extends DialogFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FILE_SELECT_CODE_JSON) {
-            if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
                 Uri uri = data.getData();
                 File config = new File(Tools.DIR_DATA, "config.json"); // file to overwrite
                 try {
                     Log.d("TAG", "Starting copy: " + uri.getPath());
-                    InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-                    FileOutputStream fileOutputStream = new FileOutputStream(config);
-                    byte buf[] = new byte[1024];
-                    int len;
-                    while ((len = inputStream.read(buf)) > 0) {
-                        fileOutputStream.write(buf, 0, len);
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    try (InputStream inputStream = getContext().getContentResolver().openInputStream(uri)) {
+                        if (inputStream == null) {
+                            throw new IOException("Unable to open picked file");
+                        }
+                        byte[] buf = new byte[1024];
+                        int len;
+                        long total = 0;
+                        while ((len = inputStream.read(buf)) > 0) {
+                            total += len;
+                            if (!ImportGuard.isWithinSizeLimit(total)) {
+                                throw new IOException("File too large (max "
+                                        + ImportGuard.MAX_IMPORT_BYTES + " bytes)");
+                            }
+                            buffer.write(buf, 0, len);
+                        }
                     }
+
+                    String text = buffer.toString("UTF-8");
+                    if (!ImportGuard.isValidJsonObject(text)) {
+                        throw new IOException("Selected file is not valid JSON");
+                    }
+
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(config)) {
+                        fileOutputStream.write(buffer.toByteArray());
+                    }
+
                     Toast.makeText(getContext(), "Config loaded. Please restart the app.",
                             Toast.LENGTH_SHORT).show();
-
-                    fileOutputStream.close();
-                    inputStream.close();
                 } catch (IOException e1) {
                     Log.d("error", "Error with file " + e1);
+                    Toast.makeText(getContext(), "Import failed: " + e1.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 }
             }
-        } else if(requestCode == FILE_SELECT_CODE_ZIP) {
-            Uri uri = data.getData();
-            // Create a temporary file in your app's cache directory
-            File tempFile = new File(getContext().getCacheDir(), "temp.zip");
+        } else if (requestCode == FILE_SELECT_CODE_ZIP) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                // Create a temporary file in your app's cache directory
+                File tempFile = new File(getContext().getCacheDir(), "temp.zip");
 
-            try {
-                // Open an InputStream to the selected file
-                InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+                try {
+                    try (InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+                         FileOutputStream fileOutputStream = new FileOutputStream(tempFile)) {
+                        if (inputStream == null) {
+                            throw new IOException("Unable to open picked file");
+                        }
 
-                // Open a FileOutputStream to your temporary file
-                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                        // Copy the contents
+                        byte[] buffer = new byte[1024];
+                        int read;
+                        long total = 0;
+                        while ((read = inputStream.read(buffer)) != -1) {
+                            total += read;
+                            if (!ImportGuard.isWithinSizeLimit(total)) {
+                                throw new IOException("File too large (max "
+                                        + ImportGuard.MAX_IMPORT_BYTES + " bytes)");
+                            }
+                            fileOutputStream.write(buffer, 0, read);
+                        }
+                    }
 
-                // Copy the contents
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = inputStream.read(buffer)) != -1) {
-                    fileOutputStream.write(buffer, 0, read);
+                    // Now you can pass the File object to your method
+                    AsyncAssetManager.extractPluginZip(tempFile);
+                } catch (IOException e) {
+                    Log.e("MyDialogFragment", "Error importing plugin zip", e);
+                    Toast.makeText(getContext(), "Import failed: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                } finally {
+                    if (tempFile.exists() && !tempFile.delete()) {
+                        Log.d("MyDialogFragment", "Failed to delete temp file " + tempFile.getPath());
+                    }
                 }
-
-                // Close the streams
-                fileOutputStream.close();
-                inputStream.close();
-
-                // Now you can pass the File object to your method
-                AsyncAssetManager.extractPluginZip(tempFile);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

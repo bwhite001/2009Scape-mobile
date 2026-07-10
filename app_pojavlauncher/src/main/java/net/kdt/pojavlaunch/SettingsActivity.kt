@@ -185,9 +185,23 @@ class SettingsActivity : BaseActivity() {
     private fun applyConfigFromUri(uri: Uri) {
         val repo = PojavApplication.appContainer.preferencesRepository
         try {
-            val body = contentResolver.openInputStream(uri)
-                ?.bufferedReader()?.use { it.readText() }
-                ?: throw IllegalStateException("could not read file")
+            val body = contentResolver.openInputStream(uri)?.use { input ->
+                val buffer = java.io.ByteArrayOutputStream()
+                val chunk = ByteArray(4096)
+                var total = 0L
+                while (true) {
+                    val read = input.read(chunk)
+                    if (read < 0) break
+                    total += read
+                    if (!ImportGuard.isWithinSizeLimit(total)) {
+                        throw IllegalStateException(
+                            "file too large (max ${ImportGuard.MAX_IMPORT_BYTES} bytes)"
+                        )
+                    }
+                    buffer.write(chunk, 0, read)
+                }
+                String(buffer.toByteArray(), Charsets.UTF_8)
+            } ?: throw IllegalStateException("could not read file")
             val result = applyConfigJson(repo, body)
             Toast.makeText(this, "Loaded $result — IP/port overridden", Toast.LENGTH_LONG).show()
             recreate()
