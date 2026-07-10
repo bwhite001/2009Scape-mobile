@@ -50,7 +50,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 023 | Fix stylus multi-pointer stuck button | P2 | S | bug | — | DONE |
 | 024 | Kotlin lint/format gate (ktlint/spotless, Kotlin-scoped) | P2 | S | dx | 009 | DONE |
 | 019 | Characterize `LayoutConverter` migration + seam | P2 | M | tests | — | DONE |
-| 020 | Trivial pure-function unit tests (JSONUtils, isValidString, SHA1) | P2 | S | tests | — | TODO |
+| 020 | Trivial pure-function unit tests (JSONUtils; isValidString/SHA1 skipped — not testable, see report) | P2 | S | tests | — | DONE |
 | 025 | Bump `material` 1.5.0 → 1.12.x | P3 | S–M | migration | — | TODO |
 | 026 | `MultiRTUtils` tar-slip + symlink containment (latent) | P3 | S | security | — | TODO |
 | 027 | INVESTIGATE: in-world cleanup only under ACTION_CANCEL | P3 | S | bug | — | TODO |
