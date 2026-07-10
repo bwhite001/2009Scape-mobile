@@ -255,6 +255,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         super.onDestroy();
         CallbackBridge.removeGrabListener(touchpad);
         CallbackBridge.removeGrabListener(minecraftGLView);
+        touchpad = null;
+        touchCharInput = null;
+        mControlLayout = null;
     }
 
     @Override
@@ -328,6 +331,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     public static void toggleMouse(Context ctx) {
         if (CallbackBridge.isGrabbing()) return;
+        if (touchpad == null || mControlLayout == null) return;
 
         boolean mouseOn = touchpad.switchState();
         mControlLayout.setMouseButtonsVisible(mouseOn);
@@ -429,6 +433,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     }
 
     public static void openLink(String link) {
+        if (touchpad == null) return;
         Context ctx = touchpad.getContext(); // no more better way to obtain a context statically
         ((Activity)ctx).runOnUiThread(() -> {
             try {
@@ -442,6 +447,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
     }
     @SuppressWarnings("unused") //TODO: actually use it
     public static void openPath(String path) {
+        if (touchpad == null) return;
         Context ctx = touchpad.getContext(); // no more better way to obtain a context statically
         ((Activity)ctx).runOnUiThread(() -> {
             try {
