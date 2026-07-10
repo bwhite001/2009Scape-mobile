@@ -36,7 +36,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 007 | Remove broken `gradle-publish.yml` (fails every release) | P1 | S | dx | — | DONE |
 | 008 | Fix stale "no unit tests" docs (CLAUDE.md, plans/README) | P1 | S | docs | — | DONE |
 | 009 | Wire `testDebugUnitTest` into CI | P1 | S | tests | — | DONE |
-| 010 | Fix `ProgressKeeper` CME on task completion | P1 | S | bug | — | TODO |
+| 010 | Fix `ProgressKeeper` CME on task completion | P1 | S | bug | — | DONE |
 | 011 | Fix `downloadFile` stream leak + unchecked `renameTo` | P1 | S | bug | — | TODO |
 | 013 | Harden config/plugin import (cancel-NPE, crash, leaks, size cap) | P1 | M | security | — | TODO |
 | 018 | Extract + unit-test server-config normalizer (dedupe port logic) | P1 | M | tests | — | TODO |

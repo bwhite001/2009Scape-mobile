@@ -38,7 +38,7 @@ public class ProgressKeeper {
 
     private static synchronized void updateTaskCount() {
         int count = sProgressStates.size();
-        for(TaskCountListener listener : sTaskCountListeners) {
+        for(TaskCountListener listener : new ArrayList<>(sTaskCountListeners)) {
             listener.onUpdateTaskCount(count);
         }
     }
