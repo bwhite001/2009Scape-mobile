@@ -56,36 +56,18 @@ public class DownloadUtils {
     public static void downloadFile(String url, File out) throws IOException {
         out.getParentFile().mkdirs();
         File tempOut = File.createTempFile(out.getName(), ".part", out.getParentFile());
-        BufferedOutputStream bos = null;
         try {
-            OutputStream bos2 = new BufferedOutputStream(new FileOutputStream(tempOut));
-            try {
-                download(url, bos2);
-                tempOut.renameTo(out);
-                if (bos2 != null) {
-                    bos2.close();
-                }
-                if (tempOut.exists()) {
-                    tempOut.delete();
-                }
-            } catch (IOException th2) {
-                if (bos != null) {
-                    bos.close();
-                }
-                if (tempOut.exists()) {
-                    tempOut.delete();
-                }
-                throw th2;
+            try (OutputStream bos = new BufferedOutputStream(new FileOutputStream(tempOut))) {
+                download(url, bos);
             }
-        } catch (IOException th3) {
-
-            if (bos != null) {
-                bos.close();
+            if (!tempOut.renameTo(out)) {
+                throw new IOException("Failed to rename " + tempOut + " to " + out);
             }
+        } catch (IOException e) {
             if (tempOut.exists()) {
                 tempOut.delete();
             }
-            throw th3;
+            throw e;
         }
     }
 
