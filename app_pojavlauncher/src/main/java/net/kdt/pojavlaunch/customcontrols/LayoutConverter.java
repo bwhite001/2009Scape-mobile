@@ -37,7 +37,24 @@ public class LayoutConverter {
             throw new JsonSyntaxException("Failed to load",e);
         }
     }
+    /**
+     * Pure ratio-to-dynamic-expression conversion extracted from the v1/v2
+     * migration ratio math so it can be characterized in a plain JVM unit test
+     * without loading Tools / org.json / ControlData / any Android class.
+     *
+     * Behaviour-identical to the previous inline
+     * {@code double ratio = coordinate/screenDimension; field = ratio + " * ${...}"}
+     * code: {@code ratio + " * " + screenVariable} yields the exact same String
+     * as the old {@code ratio + " * ${screen_width}"} concatenation.
+     */
+    static String toDynamicRatioExpression(double coordinate, int screenDimension, String screenVariable) {
+        double ratio = coordinate / screenDimension;
+        return ratio + " * " + screenVariable;
+    }
     public static CustomControls convertV2Layout(JSONObject oldLayoutJson) throws JSONException {
+        return convertV2Layout(oldLayoutJson, CallbackBridge.physicalWidth, CallbackBridge.physicalHeight);
+    }
+    public static CustomControls convertV2Layout(JSONObject oldLayoutJson, int width, int height) throws JSONException {
         CustomControls layout = Tools.GLOBAL_GSON.fromJson(oldLayoutJson.toString(), CustomControls.class);
         JSONArray layoutMainArray = oldLayoutJson.getJSONArray("mControlDataList");
         layout.mControlDataList = new ArrayList<>(layoutMainArray.length());
@@ -45,14 +62,10 @@ public class LayoutConverter {
             JSONObject button = layoutMainArray.getJSONObject(i);
             ControlData n_button = Tools.GLOBAL_GSON.fromJson(button.toString(), ControlData.class);
             if(!Tools.isValidString(n_button.dynamicX) && button.has("x")) {
-                double buttonC = button.getDouble("x");
-                double ratio = buttonC/CallbackBridge.physicalWidth;
-                n_button.dynamicX = ratio + " * ${screen_width}";
+                n_button.dynamicX = toDynamicRatioExpression(button.getDouble("x"), width, "${screen_width}");
             }
             if(!Tools.isValidString(n_button.dynamicY) && button.has("y")) {
-                double buttonC = button.getDouble("y");
-                double ratio = buttonC/CallbackBridge.physicalHeight;
-                n_button.dynamicY = ratio + " * ${screen_height}";
+                n_button.dynamicY = toDynamicRatioExpression(button.getDouble("y"), height, "${screen_height}");
             }
             layout.mControlDataList.add(n_button);
         }
@@ -63,14 +76,10 @@ public class LayoutConverter {
             JSONObject buttonProperties = button.getJSONObject("properties");
             ControlDrawerData n_button = Tools.GLOBAL_GSON.fromJson(button.toString(), ControlDrawerData.class);
             if(!Tools.isValidString(n_button.properties.dynamicX) && buttonProperties.has("x")) {
-                double buttonC = buttonProperties.getDouble("x");
-                double ratio = buttonC/CallbackBridge.physicalWidth;
-                n_button.properties.dynamicX = ratio + " * ${screen_width}";
+                n_button.properties.dynamicX = toDynamicRatioExpression(buttonProperties.getDouble("x"), width, "${screen_width}");
             }
             if(!Tools.isValidString(n_button.properties.dynamicY) && buttonProperties.has("y")) {
-                double buttonC = buttonProperties.getDouble("y");
-                double ratio = buttonC/CallbackBridge.physicalHeight;
-                n_button.properties.dynamicY = ratio + " * ${screen_height}";
+                n_button.properties.dynamicY = toDynamicRatioExpression(buttonProperties.getDouble("y"), height, "${screen_height}");
             }
             layout.mDrawerDataList.add(n_button);
         }
@@ -78,6 +87,9 @@ public class LayoutConverter {
         return layout;
     }
     public static CustomControls convertV1Layout(JSONObject oldLayoutJson) throws JSONException {
+        return convertV1Layout(oldLayoutJson, CallbackBridge.physicalWidth, CallbackBridge.physicalHeight);
+    }
+    public static CustomControls convertV1Layout(JSONObject oldLayoutJson, int width, int height) throws JSONException {
         CustomControls empty = new CustomControls();
         JSONArray layoutMainArray = oldLayoutJson.getJSONArray("mControlDataList");
         for(int i = 0; i < layoutMainArray.length(); i++) {
@@ -91,14 +103,10 @@ public class LayoutConverter {
             n_button.dynamicX = button.getString("dynamicX");
             n_button.dynamicY = button.getString("dynamicY");
             if(!Tools.isValidString(n_button.dynamicX) && button.has("x")) {
-                double buttonC = button.getDouble("x");
-                double ratio = buttonC/CallbackBridge.physicalWidth;
-                n_button.dynamicX = ratio + " * ${screen_width}";
+                n_button.dynamicX = toDynamicRatioExpression(button.getDouble("x"), width, "${screen_width}");
             }
             if(!Tools.isValidString(n_button.dynamicY) && button.has("y")) {
-                double buttonC = button.getDouble("y");
-                double ratio = buttonC/CallbackBridge.physicalHeight;
-                n_button.dynamicY = ratio + " * ${screen_height}";
+                n_button.dynamicY = toDynamicRatioExpression(button.getDouble("y"), height, "${screen_height}");
             }
             n_button.name = button.getString("name");
             n_button.opacity = ((float)((button.getInt("transparency")-100)*-1))/100f;
