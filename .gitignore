@@ -1,6 +1,6 @@
 /.gradle
 /.gradle-cache
-/.apk-build.log
+/.apk-build*.log
 /build
 /*/build
 app_pojavlauncher/src/main/assets/components/jre
@@ -10,3 +10,4 @@ local.properties
 .DS_Store
 app_pojavlauncher/.cxx/
 .vs/
+/.kotlin
