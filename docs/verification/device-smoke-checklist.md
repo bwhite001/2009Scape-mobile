@@ -9,6 +9,7 @@ and `adb install -r`. Tick every item before merging a shell change.
 - [ ] **Play HD** boots into the game (GL surface renders, reaches the client login screen).
 - [ ] **Play SD** launches the AWT path without crash.
 - [ ] First run: runtime/asset unpack shows progress and completes; game launches afterward.
+- [ ] SD: two-finger map-drag, lift one finger mid-drag — camera pans cleanly, no stuck click.
 
 ## Compose home (ScapeLauncher)
 - [ ] Home renders (title, Play HD, Play SD, Settings).

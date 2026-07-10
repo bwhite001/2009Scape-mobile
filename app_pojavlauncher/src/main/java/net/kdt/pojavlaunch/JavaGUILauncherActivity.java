@@ -187,6 +187,18 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
                     case MotionEvent.ACTION_MOVE:
                         if (mMapDragging) sendScaledMousePosition(cx + mTextureView.getX(), cy);
                         break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        // A finger is about to leave. getPointerCount() still counts it
+                        // here (Android dispatches POINTER_UP before removing the pointer),
+                        // so this event would otherwise be swallowed by this branch with the
+                        // button still held. If we're dropping to a single finger, end the
+                        // drag now — before the remaining finger's ACTION_MOVE reaches the
+                        // single-finger camera-pan path below.
+                        if (mMapDragging && event.getPointerCount() - 1 < 2) {
+                            AWTInputBridge.sendMousePress(AWTInputEvent.BUTTON1_DOWN_MASK, false);
+                            mMapDragging = false;
+                        }
+                        break;
                 }
                 prevX = event.getX(0);
                 prevY = event.getY(0);

@@ -46,7 +46,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 016 | Surface `AsyncAssetManager` unpack failures (no false "done") | P2 | M | bug | — | DONE |
 | 017 | Null `MainActivity` static Views in `onDestroy` (+guards) | P2 | S–M | bug | — | DONE |
 | 021 | Dependency vuln-scan CI job + inventory `libs/*.jar` | P2 | S | security | — | DONE |
-| 022 | Fix SD map-drag 2→1-finger BUTTON1 hold | P2 | S | bug | — | TODO |
+| 022 | Fix SD map-drag 2→1-finger BUTTON1 hold | P2 | S | bug | — | DONE |
 | 023 | Fix stylus multi-pointer stuck button | P2 | S | bug | — | TODO |
 | 024 | Kotlin lint/format gate (ktlint/spotless, Kotlin-scoped) | P2 | S | dx | 009 | TODO |
 | 019 | Characterize `LayoutConverter` migration + seam | P2 | M | tests | — | TODO |
