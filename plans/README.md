@@ -39,7 +39,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 010 | Fix `ProgressKeeper` CME on task completion | P1 | S | bug | — | DONE |
 | 011 | Fix `downloadFile` stream leak + unchecked `renameTo` | P1 | S | bug | — | DONE |
 | 013 | Harden config/plugin import (cancel-NPE, crash, leaks, size cap) | P1 | M | security | — | DONE |
-| 018 | Extract + unit-test server-config normalizer (dedupe port logic) | P1 | M | tests | — | TODO |
+| 018 | Extract + unit-test server-config normalizer (dedupe port logic) | P1 | M | tests | — | DONE |
 | 012 | Remove 3× `System.gc()` on the UI thread | P2 | S | bug | — | TODO |
 | 014 | Config-import transport (cleartext scoping, default URL, read cap) | P2 | S–M | security | — | TODO |
 | 015 | Zip-bomb size/entry caps in `ZipTool.unzip` | P2 | M | security | — | TODO |

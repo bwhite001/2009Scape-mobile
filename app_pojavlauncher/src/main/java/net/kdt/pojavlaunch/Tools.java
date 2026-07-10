@@ -158,8 +158,8 @@ public final class Tools {
         try {
             android.content.SharedPreferences prefs =
                 androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity);
-            String ip   = prefs.getString("serverIp",   "127.0.0.1");
-            String port = prefs.getString("serverPort",  "43595");
+            String ip   = prefs.getString("serverIp",   ServerConfig.DEFAULT_IP);
+            String port = prefs.getString("serverPort",  String.valueOf(ServerConfig.DEFAULT_PORT));
             if (ip == null || ip.isEmpty()) return;
 
             File configFile = new File(DIR_DATA, "config.json");
@@ -167,36 +167,36 @@ public final class Tools {
 
             String raw = read(configFile.getAbsolutePath());
             org.json.JSONObject json = new org.json.JSONObject(raw);
-            json.put("ip_address",    ip);
-            json.put("ip_management", ip);
-            if (port == null || port.trim().isEmpty()) port = "43595";
-            int portInt;
-            try {
-                portInt = Integer.parseInt(port.trim());
-            } catch (NumberFormatException e) {
-                portInt = 43595;
-                android.util.Log.w("Tools", "patchConfigJson: invalid port '" + port + "', using 43595");
-            }
+
             // This server multiplexes login, JS5 and world-list on a single port
             // (43594 + worldId = 43595 for world 1), so all three must be that same
             // port. The known-good desktop server_profiles.json uses 43595 for all
-            // three; the previous "portInt - 1" pointed server_port at a dead 43594
-            // and caused error_game_js5connect.
-            json.put("server_port", portInt);
-            json.put("wl_port",     portInt);
-            json.put("js5_port",    portInt);
+            // three; a prior "portInt - 1" pointed server_port at a dead 43594 and
+            // caused error_game_js5connect.
+            ServerConfig.Result resolved = ServerConfig.normalize(ip, ip, port, null, null);
+            json.put("ip_address",    resolved.ip);
+            json.put("ip_management", resolved.ip);
+            json.put("server_port", resolved.port);
+            json.put("wl_port",     resolved.port);
+            json.put("js5_port",    resolved.port);
 
             try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
                 fw.write(json.toString(2));
             }
 
             // Read-back so the device log shows exactly what the client will dial.
-            String readback = "config.json -> ip=" + ip
-                    + " server_port=" + portInt
-                    + " wl_port=" + portInt
-                    + " js5_port=" + portInt;
+            String readback = "config.json -> ip=" + resolved.ip
+                    + " server_port=" + resolved.port
+                    + " wl_port=" + resolved.port
+                    + " js5_port=" + resolved.port;
             android.util.Log.i("Tools", readback);
-            try { Logger.appendToLog("[launcher] " + readback); } catch (Throwable ignored) {}
+            try {
+                Logger.appendToLog("[launcher] " + readback);
+            } catch (Throwable ignored) {
+                // Best-effort device-log mirror; failure here must not block config.json
+                // from having already been written above, so we swallow and move on.
+                android.util.Log.d("Tools", "patchConfigJson: log mirror failed", ignored);
+            }
         } catch (Exception e) {
             android.util.Log.w("Tools", "patchConfigJson failed: " + e.getMessage());
         }

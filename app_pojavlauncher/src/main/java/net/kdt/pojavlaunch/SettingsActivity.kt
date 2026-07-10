@@ -217,17 +217,19 @@ class SettingsActivity : BaseActivity() {
      */
     private fun applyConfigJson(repo: PreferencesRepository, body: String): String {
         val json = org.json.JSONObject(body)
-        val ip = json.optString("ip_address", json.optString("ip_management", ""))
-        if (ip.isEmpty()) throw IllegalStateException("config has no ip_address")
-        val port = when {
-            json.has("wl_port")     -> json.getInt("wl_port")
-            json.has("js5_port")    -> json.getInt("js5_port")
-            json.has("server_port") -> json.getInt("server_port")
-            else -> 43595
+        val ipAddress = if (json.has("ip_address")) json.getString("ip_address") else null
+        val ipManagement = if (json.has("ip_management")) json.getString("ip_management") else null
+        if (ipAddress.isNullOrEmpty() && ipManagement.isNullOrEmpty()) {
+            throw IllegalStateException("config has no ip_address")
         }
-        repo.putString("serverIp", ip)
-        repo.putString("serverPort", port.toString())
-        return "$ip:$port"
+        val serverPort = if (json.has("server_port")) json.getInt("server_port").toString() else null
+        val wlPort = if (json.has("wl_port")) json.getInt("wl_port").toString() else null
+        val js5Port = if (json.has("js5_port")) json.getInt("js5_port").toString() else null
+
+        val resolved = ServerConfig.normalize(ipAddress, ipManagement, serverPort, wlPort, js5Port)
+        repo.putString("serverIp", resolved.ip)
+        repo.putString("serverPort", resolved.port.toString())
+        return "${resolved.ip}:${resolved.port}"
     }
 }
 
