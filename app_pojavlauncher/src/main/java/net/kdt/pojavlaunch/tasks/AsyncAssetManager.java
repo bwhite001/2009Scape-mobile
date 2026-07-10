@@ -56,6 +56,7 @@ public class AsyncAssetManager {
                 MultiRTUtils.postPrepare("Internal");
             }catch (IOException e) {
                 Log.e("JREAuto", "Internal JRE unpack failed", e);
+                net.kdt.pojavlaunch.PojavApplication.appContainer.getProgressRepository().reportUnpackFailure();
             }
         });
     }
@@ -100,6 +101,7 @@ public class AsyncAssetManager {
                 // NOTE: saveAssetVersion is intentionally NOT called here — unpackComponents does it
             } catch (IOException e) {
                 Log.e("AsyncAssetManager", "Failed to unpack critical components !");
+                net.kdt.pojavlaunch.PojavApplication.appContainer.getProgressRepository().reportUnpackFailure();
             }
             ProgressLayout.clearProgress(ProgressLayout.EXTRACT_SINGLE_FILES);
         });
@@ -122,6 +124,7 @@ public class AsyncAssetManager {
                 if (overwrite) saveAssetVersion(ctx);
             } catch (IOException e) {
                 Log.e("AsyncAssetManager", "Failed o unpack components !",e );
+                net.kdt.pojavlaunch.PojavApplication.appContainer.getProgressRepository().reportUnpackFailure();
             }
             ProgressLayout.clearProgress(ProgressLayout.EXTRACT_COMPONENTS);
         });
