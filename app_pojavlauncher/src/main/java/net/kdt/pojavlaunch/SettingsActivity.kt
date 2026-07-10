@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.kdt.pojavlaunch.customcontrols.CustomControlsActivity
@@ -44,13 +48,22 @@ import net.kdt.pojavlaunch.ui.rs.RsToggle
 import net.kdt.pojavlaunch.ui.theme.LauncherTheme
 import net.kdt.pojavlaunch.ui.theme.RsColors
 
-private data class BoolPref(val key: String, val label: String, val def: Boolean)
+private data class BoolPref(
+    val key: String,
+    @StringRes val labelRes: Int,
+    val def: Boolean,
+)
 
-private data class IntPref(val key: String, val label: String, val def: Int, val range: IntRange)
+private data class IntPref(
+    val key: String,
+    @StringRes val labelRes: Int,
+    val def: Int,
+    val range: IntRange,
+)
 
 private data class StringPref(
     val key: String,
-    val label: String,
+    @StringRes val labelRes: Int,
     val def: String,
     val keyboardType: KeyboardType = KeyboardType.Text,
 )
@@ -60,55 +73,55 @@ private data class StringPref(
 // gamepad remap, plugins, file import) stay in the legacy "Advanced" dialog.
 private val VIDEO_BOOLS =
     listOf(
-        BoolPref("ignoreNotch", "Ignore notch", false),
-        BoolPref("sustainedPerformance", "Sustained performance mode", false),
-        BoolPref("force_vsync", "Force VSync", false),
+        BoolPref("ignoreNotch", R.string.pref_ignore_notch, false),
+        BoolPref("sustainedPerformance", R.string.pref_sustained_performance, false),
+        BoolPref("force_vsync", R.string.pref_force_vsync, false),
     )
 private val VIDEO_INTS =
     listOf(
-        IntPref("resolutionRatio", "Resolution scale", 60, 25..100),
-        IntPref("xinset", "Horizontal inset", 0, 0..100),
+        IntPref("resolutionRatio", R.string.pref_resolution_scale, 60, 25..100),
+        IntPref("xinset", R.string.pref_horizontal_inset, 0, 0..100),
     )
 private val CONTROL_BOOLS =
     listOf(
-        BoolPref("disableGestures", "Disable gestures", false),
-        BoolPref("disableDoubleTap", "Disable double-tap to swap hands", false),
-        BoolPref("singleTapRightClick", "Single-tap opens right-click menu", false),
-        BoolPref("haptic", "Haptic feedback", true),
-        BoolPref("mouse_start", "Start with virtual mouse enabled", false),
-        BoolPref("buttonAllCaps", "Uppercase button labels", true),
-        BoolPref("enableGyro", "Enable gyro aiming", false),
-        BoolPref("gyroSmoothing", "Gyro smoothing", true),
-        BoolPref("gyroInvertX", "Invert gyro X", false),
-        BoolPref("gyroInvertY", "Invert gyro Y", false),
+        BoolPref("disableGestures", R.string.pref_disable_gestures, false),
+        BoolPref("disableDoubleTap", R.string.pref_disable_double_tap, false),
+        BoolPref("singleTapRightClick", R.string.pref_single_tap_right_click, false),
+        BoolPref("haptic", R.string.pref_haptic, true),
+        BoolPref("mouse_start", R.string.pref_mouse_start, false),
+        BoolPref("buttonAllCaps", R.string.pref_button_all_caps, true),
+        BoolPref("enableGyro", R.string.pref_enable_gyro, false),
+        BoolPref("gyroSmoothing", R.string.pref_gyro_smoothing, true),
+        BoolPref("gyroInvertX", R.string.pref_gyro_invert_x, false),
+        BoolPref("gyroInvertY", R.string.pref_gyro_invert_y, false),
     )
 private val CONTROL_INTS =
     listOf(
-        IntPref("buttonscale", "Button size", 100, 25..500),
-        IntPref("mousescale", "Mouse pointer size", 100, 25..300),
-        IntPref("mousespeed", "Mouse speed", 100, 25..300),
-        IntPref("timeLongPressTrigger", "Long-press delay (ms)", 300, 100..1000),
-        IntPref("gyroSensitivity", "Gyro sensitivity", 100, 10..300),
-        IntPref("gyroSampleRate", "Gyro sample rate (ms)", 16, 5..50),
-        IntPref("gamepad_deadzone_scale", "Gamepad deadzone", 100, 0..200),
+        IntPref("buttonscale", R.string.pref_button_size, 100, 25..500),
+        IntPref("mousescale", R.string.pref_mouse_scale, 100, 25..300),
+        IntPref("mousespeed", R.string.pref_mouse_speed, 100, 25..300),
+        IntPref("timeLongPressTrigger", R.string.pref_long_press_delay, 300, 100..1000),
+        IntPref("gyroSensitivity", R.string.pref_gyro_sensitivity, 100, 10..300),
+        IntPref("gyroSampleRate", R.string.pref_gyro_sample_rate, 16, 5..50),
+        IntPref("gamepad_deadzone_scale", R.string.pref_gamepad_deadzone, 100, 0..200),
     )
 private val JAVA_BOOLS =
     listOf(
-        BoolPref("java_sandbox", "Java sandbox", true),
+        BoolPref("java_sandbox", R.string.pref_java_sandbox, true),
     )
 private val JAVA_INTS =
     listOf(
-        IntPref("allocation", "RAM allocation (MB)", 256, 256..1024),
+        IntPref("allocation", R.string.pref_ram_allocation, 256, 256..1024),
     )
 private val MISC_BOOLS =
     listOf(
-        BoolPref("checkLibraries", "Verify library integrity", true),
-        BoolPref("arc_capes", "Arc capes", false),
+        BoolPref("checkLibraries", R.string.pref_check_libraries, true),
+        BoolPref("arc_capes", R.string.pref_arc_capes, false),
     )
 private val EXPERIMENTAL_BOOLS =
     listOf(
-        BoolPref("dump_shaders", "Dump shaders", false),
-        BoolPref("bigCoreAffinity", "Big-core affinity", false),
+        BoolPref("dump_shaders", R.string.pref_dump_shaders, false),
+        BoolPref("bigCoreAffinity", R.string.pref_big_core_affinity, false),
     )
 private const val DEFAULT_CONFIG_URL = ""
 
@@ -121,9 +134,9 @@ private const val MAX_CONFIG_BYTES = 512 * 1024
 
 private val SERVER_STRINGS =
     listOf(
-        StringPref("serverIp", "Server IP address", "127.0.0.1"),
-        StringPref("serverPort", "Server port", "43595", KeyboardType.Number),
-        StringPref("serverConfigUrl", "Config import URL", DEFAULT_CONFIG_URL),
+        StringPref("serverIp", R.string.pref_server_ip, "127.0.0.1"),
+        StringPref("serverPort", R.string.pref_server_port, "43595", KeyboardType.Number),
+        StringPref("serverConfigUrl", R.string.pref_server_config_url, DEFAULT_CONFIG_URL),
     )
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
@@ -169,14 +182,14 @@ class SettingsActivity : BaseActivity() {
     private fun importServerConfig(repo: PreferencesRepository) {
         val url = repo.getString("serverConfigUrl", DEFAULT_CONFIG_URL)?.trim().orEmpty()
         if (url.isEmpty()) {
-            Toast.makeText(this, "Set a config import URL first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.settings_import_need_url), Toast.LENGTH_SHORT).show()
             return
         }
         val importMessage =
             if (url.startsWith("http://", ignoreCase = true)) {
-                "Importing over HTTP (unencrypted) from $url…"
+                getString(R.string.settings_import_http_warn, url)
             } else {
-                "Importing config from $url…"
+                getString(R.string.settings_import_start, url)
             }
         Toast.makeText(this, importMessage, Toast.LENGTH_SHORT).show()
         Thread {
@@ -208,12 +221,12 @@ class SettingsActivity : BaseActivity() {
                 conn.disconnect()
                 val result = applyConfigJson(repo, body)
                 runOnUiThread {
-                    Toast.makeText(this, "Imported $result — IP/port overridden", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.settings_import_ok, result), Toast.LENGTH_LONG).show()
                     recreate()
                 }
             } catch (e: Exception) {
                 runOnUiThread {
-                    Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.settings_import_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 }
             }
         }.start()
@@ -246,10 +259,10 @@ class SettingsActivity : BaseActivity() {
                     String(buffer.toByteArray(), Charsets.UTF_8)
                 } ?: throw IllegalStateException("could not read file")
             val result = applyConfigJson(repo, body)
-            Toast.makeText(this, "Loaded $result — IP/port overridden", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.settings_load_ok, result), Toast.LENGTH_LONG).show()
             recreate()
         } catch (e: Exception) {
-            Toast.makeText(this, "Load failed: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.settings_load_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -305,7 +318,7 @@ private fun SettingsScreen(
                 .padding(1.dp)
                 .background(RsColors.bgPanel),
         ) {
-            RsHeaderBand("Settings")
+            RsHeaderBand(stringResource(R.string.settings_title))
             Row(
                 Modifier.fillMaxWidth().padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -313,32 +326,32 @@ private fun SettingsScreen(
                 RsBackButton(onClick = onBack)
             }
             LazyColumn(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp)) {
-                section("Server") {
+                section(R.string.settings_section_server) {
                     SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
                     item {
                         Spacer(Modifier.height(8.dp))
-                        RsButton("Import config from URL", onClick = onImportConfig, muted = true)
+                        RsButton(stringResource(R.string.settings_import_url), onClick = onImportConfig, muted = true)
                     }
                     item {
                         Spacer(Modifier.height(6.dp))
-                        RsButton("Load config.json from file", onClick = onPickConfigFile, muted = true)
+                        RsButton(stringResource(R.string.settings_load_file), onClick = onPickConfigFile, muted = true)
                     }
                 }
-                prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
-                prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)
+                prefSection(R.string.settings_section_video, VIDEO_BOOLS, VIDEO_INTS, repo)
+                prefSection(R.string.settings_section_controls, CONTROL_BOOLS, CONTROL_INTS, repo)
                 item {
                     Spacer(Modifier.height(8.dp))
-                    RsButton("Edit on-screen controls", onClick = onOpenControls, muted = true)
+                    RsButton(stringResource(R.string.settings_edit_controls), onClick = onOpenControls, muted = true)
                 }
-                prefSection("Java", JAVA_BOOLS, JAVA_INTS, repo)
+                prefSection(R.string.settings_section_java, JAVA_BOOLS, JAVA_INTS, repo)
                 item { JavaArgsRow(repo) }
-                prefSection("Misc", MISC_BOOLS, emptyList(), repo)
-                prefSection("Experimental", EXPERIMENTAL_BOOLS, emptyList(), repo)
+                prefSection(R.string.settings_section_misc, MISC_BOOLS, emptyList(), repo)
+                prefSection(R.string.settings_section_experimental, EXPERIMENTAL_BOOLS, emptyList(), repo)
                 item {
-                    RsSectionHeader("Advanced")
-                    Text("Renderer, runtime, plugins, and imports", color = RsColors.textMuted)
+                    RsSectionHeader(stringResource(R.string.settings_section_advanced))
+                    Text(stringResource(R.string.settings_advanced_desc), color = RsColors.textMuted)
                     Spacer(Modifier.height(8.dp))
-                    RsButton("Open advanced settings", onClick = onOpenAdvanced, muted = true)
+                    RsButton(stringResource(R.string.settings_open_advanced), onClick = onOpenAdvanced, muted = true)
                     Spacer(Modifier.height(20.dp))
                 }
             }
@@ -347,21 +360,21 @@ private fun SettingsScreen(
 }
 
 private fun LazyListScope.prefSection(
-    title: String,
+    @StringRes titleRes: Int,
     bools: List<BoolPref>,
     ints: List<IntPref>,
     repo: PreferencesRepository,
 ) {
-    item { RsSectionHeader(title) }
+    item { RsSectionHeader(stringResource(titleRes)) }
     items(bools) { BoolRow(it, repo) }
     items(ints) { IntRow(it, repo) }
 }
 
 private fun LazyListScope.section(
-    title: String,
+    @StringRes titleRes: Int,
     content: LazyListScope.() -> Unit,
 ) {
-    item { RsSectionHeader(title) }
+    item { RsSectionHeader(stringResource(titleRes)) }
     content()
 }
 
@@ -375,7 +388,7 @@ private fun BoolRow(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(pref.label, color = RsColors.textBody, modifier = Modifier.weight(1f))
+        Text(stringResource(pref.labelRes), color = RsColors.textBody, modifier = Modifier.weight(1f))
         RsToggle(checked = checked, onCheckedChange = {
             checked = it
             repo.putBoolean(pref.key, it)
@@ -391,7 +404,7 @@ private fun IntRow(
     var value by remember { mutableIntStateOf(repo.getInt(pref.key, pref.def)) }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(pref.label, color = RsColors.textBody)
+            Text(stringResource(pref.labelRes), color = RsColors.textBody)
             Text("$value", color = RsColors.textBright)
         }
         RsSlider(
@@ -399,6 +412,7 @@ private fun IntRow(
             onValueChange = { value = it.toInt() },
             valueRange = pref.range.first.toFloat()..pref.range.last.toFloat(),
             onValueChangeFinished = { repo.putInt(pref.key, value) },
+            modifier = Modifier.semantics { stateDescription = value.toString() },
         )
     }
 }
@@ -420,7 +434,7 @@ private fun StringRow(
 ) {
     var value by remember { mutableStateOf(repo.getString(pref.key, pref.def) ?: pref.def) }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-        Text(pref.label, color = RsColors.textBody)
+        Text(stringResource(pref.labelRes), color = RsColors.textBody)
         OutlinedTextField(
             value = value,
             onValueChange = {
@@ -439,7 +453,7 @@ private fun StringRow(
 private fun JavaArgsRow(repo: PreferencesRepository) {
     var text by remember { mutableStateOf(repo.getString("javaArgs", "") ?: "") }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-        Text("Custom Java arguments", color = RsColors.textBody)
+        Text(stringResource(R.string.pref_java_args), color = RsColors.textBody)
         OutlinedTextField(
             value = text,
             onValueChange = {

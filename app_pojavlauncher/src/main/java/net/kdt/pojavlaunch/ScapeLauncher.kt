@@ -116,11 +116,11 @@ private fun HomeScreen(
             RsPanel(modifier = Modifier.widthIn(max = 420.dp)) {
                 ScapeLogo()
                 Spacer(Modifier.height(20.dp))
-                RsButton("Play HD", onClick = onPlayHd)
+                RsButton(stringResource(R.string.launcher_play_hd), onClick = onPlayHd)
                 Spacer(Modifier.height(8.dp))
-                RsButton("Play SD", onClick = onPlaySd)
+                RsButton(stringResource(R.string.launcher_play_sd), onClick = onPlaySd)
                 Spacer(Modifier.height(10.dp))
-                RsLink("Settings", onClick = onSettings)
+                RsLink(stringResource(R.string.launcher_settings), onClick = onSettings)
                 if (progress.isBusy) {
                     Spacer(Modifier.height(16.dp))
                     LinearProgressIndicator(
