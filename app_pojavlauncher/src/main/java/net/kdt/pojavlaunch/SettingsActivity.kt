@@ -219,14 +219,18 @@ class SettingsActivity : BaseActivity() {
         val json = org.json.JSONObject(body)
         val ipAddress = if (json.has("ip_address")) json.getString("ip_address") else null
         val ipManagement = if (json.has("ip_management")) json.getString("ip_management") else null
-        if (ipAddress.isNullOrEmpty() && ipManagement.isNullOrEmpty()) {
+        // Faithful to the old `json.optString("ip_address", json.optString("ip_management", ""))`:
+        // fall back to ip_management ONLY when ip_address is entirely absent, not merely blank.
+        // An `ip_address: ""` key that IS present must NOT fall back and must still throw below.
+        val ip = ServerConfig.resolvePresentIp(ipAddress, ipManagement)
+        if (ip.isEmpty()) {
             throw IllegalStateException("config has no ip_address")
         }
         val serverPort = if (json.has("server_port")) json.getInt("server_port").toString() else null
         val wlPort = if (json.has("wl_port")) json.getInt("wl_port").toString() else null
         val js5Port = if (json.has("js5_port")) json.getInt("js5_port").toString() else null
 
-        val resolved = ServerConfig.normalize(ipAddress, ipManagement, serverPort, wlPort, js5Port)
+        val resolved = ServerConfig.normalize(ip, ip, serverPort, wlPort, js5Port)
         repo.putString("serverIp", resolved.ip)
         repo.putString("serverPort", resolved.port.toString())
         return "${resolved.ip}:${resolved.port}"

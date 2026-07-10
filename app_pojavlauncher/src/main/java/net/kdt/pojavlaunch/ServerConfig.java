@@ -27,9 +27,18 @@ public class ServerConfig {
     public static final class Result {
         public final String ip;
         public final int port;
-        public Result(String ip, int port) {
+        /**
+         * True when none of the supplied port candidates resolved to a valid
+         * [1, 65535] integer and {@link #port} therefore fell back to
+         * {@link #DEFAULT_PORT}. Callers that source the port from a single
+         * user-editable preference (e.g. Tools.patchConfigJson) should log a
+         * warning when this is true so the fallback is not silent.
+         */
+        public final boolean portFellBackToDefault;
+        public Result(String ip, int port, boolean portFellBackToDefault) {
             this.ip = ip;
             this.port = port;
+            this.portFellBackToDefault = portFellBackToDefault;
         }
     }
 
@@ -37,7 +46,23 @@ public class ServerConfig {
                                     String serverPort, String wlPort, String js5Port) {
         String ip = firstNonBlank(ipAddress, ipManagement, DEFAULT_IP);
         Integer port = firstValidPort(wlPort, js5Port, serverPort);
-        return new Result(ip, port != null ? port : DEFAULT_PORT);
+        boolean fellBack = port == null;
+        return new Result(ip, fellBack ? DEFAULT_PORT : port, fellBack);
+    }
+
+    /**
+     * Resolves an ip field using the same semantics as
+     * {@code JSONObject#optString(primaryKey, JSONObject#optString(secondaryKey, ""))}:
+     * fall back from the primary candidate to the secondary ONLY when the
+     * primary is entirely ABSENT (represented here as {@code null}), not
+     * merely blank/empty when present. Pass {@code null} for a candidate
+     * whose source key is absent, or the (possibly empty) string value when
+     * the key is present.
+     */
+    public static String resolvePresentIp(String ipAddressIfPresent, String ipManagementIfPresent) {
+        if (ipAddressIfPresent != null) return ipAddressIfPresent;
+        if (ipManagementIfPresent != null) return ipManagementIfPresent;
+        return "";
     }
 
     private static String firstNonBlank(String a, String b, String fallback) {

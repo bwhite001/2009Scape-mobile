@@ -174,6 +174,10 @@ public final class Tools {
             // three; a prior "portInt - 1" pointed server_port at a dead 43594 and
             // caused error_game_js5connect.
             ServerConfig.Result resolved = ServerConfig.normalize(ip, ip, port, null, null);
+            if (resolved.portFellBackToDefault) {
+                android.util.Log.w("Tools", "patchConfigJson: invalid port '" + port
+                        + "', using " + ServerConfig.DEFAULT_PORT);
+            }
             json.put("ip_address",    resolved.ip);
             json.put("ip_management", resolved.ip);
             json.put("server_port", resolved.port);
