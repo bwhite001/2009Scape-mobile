@@ -100,7 +100,14 @@ private val EXPERIMENTAL_BOOLS = listOf(
     BoolPref("dump_shaders", "Dump shaders", false),
     BoolPref("bigCoreAffinity", "Big-core affinity", false),
 )
-private const val DEFAULT_CONFIG_URL = "http://192.168.0.243:8080/config.json"
+private const val DEFAULT_CONFIG_URL = ""
+
+/**
+ * Hard ceiling on the size of a downloaded config.json body. A real config is
+ * a handful of fields (well under a KB); this just bounds a malicious or
+ * misbehaving server from streaming an unbounded response into memory.
+ */
+private const val MAX_CONFIG_BYTES = 512 * 1024
 
 private val SERVER_STRINGS = listOf(
     StringPref("serverIp",   "Server IP address", "127.0.0.1"),
@@ -154,7 +161,12 @@ class SettingsActivity : BaseActivity() {
             Toast.makeText(this, "Set a config import URL first", Toast.LENGTH_SHORT).show()
             return
         }
-        Toast.makeText(this, "Importing config from $url…", Toast.LENGTH_SHORT).show()
+        val importMessage = if (url.startsWith("http://", ignoreCase = true)) {
+            "Importing over HTTP (unencrypted) from $url…"
+        } else {
+            "Importing config from $url…"
+        }
+        Toast.makeText(this, importMessage, Toast.LENGTH_SHORT).show()
         Thread {
             try {
                 val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
@@ -162,7 +174,23 @@ class SettingsActivity : BaseActivity() {
                     readTimeout = 5000
                     requestMethod = "GET"
                 }
-                val body = conn.inputStream.bufferedReader().use { it.readText() }
+                val body = conn.inputStream.use { input ->
+                    val buffer = java.io.ByteArrayOutputStream()
+                    val chunk = ByteArray(4096)
+                    var total = 0
+                    while (true) {
+                        val read = input.read(chunk)
+                        if (read < 0) break
+                        total += read
+                        if (total > MAX_CONFIG_BYTES) {
+                            throw IllegalStateException(
+                                "response too large (max $MAX_CONFIG_BYTES bytes)"
+                            )
+                        }
+                        buffer.write(chunk, 0, read)
+                    }
+                    String(buffer.toByteArray(), Charsets.UTF_8)
+                }
                 conn.disconnect()
                 val result = applyConfigJson(repo, body)
                 runOnUiThread {
