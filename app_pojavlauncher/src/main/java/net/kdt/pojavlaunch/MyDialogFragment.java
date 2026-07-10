@@ -218,6 +218,19 @@ public class MyDialogFragment extends DialogFragment {
                     if (!ImportGuard.isValidJsonObject(text)) {
                         throw new IOException("Selected file is not valid JSON");
                     }
+                    // ImportGuard's check above is a cheap structural (brace/bracket
+                    // balance) pre-filter only — it accepts balanced-but-invalid JSON
+                    // such as {"a" "b"} or {,,,}. This file is written straight to
+                    // config.json, which the native RT4-Client JVM reads directly at
+                    // launch with no further re-parse in-app, so do a real parse here
+                    // (on-device org.json is the genuine implementation, unlike the
+                    // no-op stub used by the unit-test harness) and reject anything
+                    // that doesn't actually parse.
+                    try {
+                        new org.json.JSONObject(text.trim());
+                    } catch (org.json.JSONException e) {
+                        throw new IOException("Selected file is not valid JSON: " + e.getMessage());
+                    }
 
                     try (FileOutputStream fileOutputStream = new FileOutputStream(config)) {
                         fileOutputStream.write(buffer.toByteArray());
