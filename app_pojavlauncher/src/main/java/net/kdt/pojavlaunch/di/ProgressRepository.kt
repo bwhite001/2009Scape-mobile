@@ -14,6 +14,7 @@ data class ProgressUiState(
     val progress: Int = 0,
     val messageResId: Int = 0,
     val args: List<Any?> = emptyList(),
+    val unpackFailed: Boolean = false,
 ) {
     val isBusy: Boolean get() = taskCount > 0
 }
@@ -57,5 +58,15 @@ class ProgressRepository {
     init {
         observedKeys.forEach { ProgressKeeper.addListener(it, progressListener) }
         ProgressKeeper.addTaskCountListener(taskCountListener, true)
+    }
+
+    /**
+     * Marks that an asset/runtime unpack failed. Intentionally sticky: it is
+     * never cleared automatically as a side effect of an unrelated progress
+     * update (see AsyncAssetManager) — only a fresh, successful unpack
+     * attempt (or, in the future, an explicit retry) should reset it.
+     */
+    fun reportUnpackFailure() {
+        _state.value = _state.value.copy(unpackFailed = true)
     }
 }
