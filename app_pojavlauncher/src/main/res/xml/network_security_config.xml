@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Scopes cleartext (plain HTTP) traffic to LAN-style addresses only. The
+  "Import config from URL" feature (SettingsActivity.importServerConfig) is
+  the one load-bearing user of cleartext HTTP in this app: it fetches a
+  config.json from a server on the user's own LAN (see run-local.sh's "web"
+  target in the server repo, which serves config.json via plain nginx HTTP).
+
+  Android's domain element only supports exact hostname/IP (or subdomain)
+  matches, not CIDR ranges, so a literal "any private LAN IP" allowlist is
+  not expressible here. This config instead disables cleartext by default
+  and permits it only for loopback plus a handful of literal example
+  addresses drawn from the RFC 1918 private-use ranges.
+
+  KNOWN LIMITATION (see plans/014-config-import-transport-hardening.md): a
+  real deployment's LAN IP (e.g. 192.168.0.243, an assigned host address,
+  not a bare network address) will NOT literally match any entry below.
+  Android's network security config has no CIDR/wildcard form for IP
+  literals, so "any address in a private range" is genuinely not
+  expressible via this mechanism. If your run-local.sh-advertised world IP
+  doesn't match one of the literals below, add it explicitly as its own
+  domain entry before building, or the cleartext config-import fetch will
+  be blocked and surfaced via the existing import-failure toast.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <!-- Example private LAN network addresses; add your specific LAN host IP here too -->
+        <domain includeSubdomains="true">10.0.0.0</domain>
+        <domain includeSubdomains="true">192.168.0.0</domain>
+        <domain includeSubdomains="true">172.16.0.0</domain>
+    </domain-config>
+</network-security-config>
