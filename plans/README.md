@@ -43,7 +43,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 012 | Remove 3× `System.gc()` on the UI thread | P2 | S | bug | — | DONE |
 | 014 | Config-import transport (cleartext scoping, default URL, read cap) | P2 | S–M | security | — | DONE |
 | 015 | Zip-bomb size/entry caps in `ZipTool.unzip` | P2 | M | security | — | DONE |
-| 016 | Surface `AsyncAssetManager` unpack failures (no false "done") | P2 | M | bug | — | TODO |
+| 016 | Surface `AsyncAssetManager` unpack failures (no false "done") | P2 | M | bug | — | DONE |
 | 017 | Null `MainActivity` static Views in `onDestroy` (+guards) | P2 | S–M | bug | — | TODO |
 | 021 | Dependency vuln-scan CI job + inventory `libs/*.jar` | P2 | S | security | — | TODO |
 | 022 | Fix SD map-drag 2→1-finger BUTTON1 hold | P2 | S | bug | — | TODO |
