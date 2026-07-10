@@ -24,7 +24,26 @@ import net.kdt.pojavlaunch.utils.*;
 
 public class PojavApplication extends Application {
 	public static final String CRASH_REPORT_TAG = "PojavCrashReport";
-	public static final ExecutorService sExecutorService = new ThreadPoolExecutor(4, 4, 500, TimeUnit.MILLISECONDS,  new LinkedBlockingQueue<>());
+	private static final ThreadPoolExecutor sThreadPoolExecutor = new ThreadPoolExecutor(
+			4, 4, 500, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+			new java.util.concurrent.ThreadFactory() {
+				private final java.util.concurrent.atomic.AtomicInteger mCount =
+						new java.util.concurrent.atomic.AtomicInteger(0);
+				@Override
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r, "pojav-pool-" + mCount.getAndIncrement());
+					t.setDaemon(true);
+					return t;
+				}
+			});
+	static {
+		// Without this, corePoolSize == maximumPoolSize made the 500ms keep-alive
+		// dead configuration (core threads never timed out, max was never exceeded
+		// because the queue is unbounded). This activates it so idle threads
+		// actually exit and get recreated on demand.
+		sThreadPoolExecutor.allowCoreThreadTimeOut(true);
+	}
+	public static final ExecutorService sExecutorService = sThreadPoolExecutor;
 	public static AppContainer appContainer;
 	
 	@Override
