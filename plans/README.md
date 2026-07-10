@@ -57,7 +57,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 028 | Tune shared `ThreadPoolExecutor` (low leverage) | P3 | S | tech-debt | — | DONE |
 | 029 | SPIKE: server-profile switcher | P2 | M | direction | 018 | DONE (doc-only — see `docs/design/server-profiles.md`) |
 | 030 | SPIKE: SHA-256 artifact/config integrity | P2 | L | direction | — | DONE (doc-only — see `docs/design/artifact-config-integrity.md`) |
-| 031 | DESIGN: in-app plugin manager | P3 | L | direction | 030, 015 | TODO |
+| 031 | DESIGN: in-app plugin manager | P3 | L | direction | 030, 015 | DONE (doc-only — see `docs/design/plugin-manager.md`) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
