@@ -1,0 +1,49 @@
+name: Dependency Vulnerability Scan
+on:
+  push:
+    branches-ignore:
+      - 'l10n_v3_openjdk2'
+  pull_request:
+    branches-ignore:
+      - 'l10n_v3_openjdk2'
+    types: [ opened, reopened ]
+  workflow_dispatch:
+  schedule:
+    # Weekly, independent of code changes, since CVE databases update on
+    # their own schedule. Scheduled runs execute on the default branch and
+    # do not show up in any PR's own check list.
+    - cron: '0 6 * * 1'
+
+jobs:
+  scan:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Filesystem scan (not a Gradle-manifest scan): this also inspects the
+      # binary content of app_pojavlauncher/libs/*.jar (ExagearApacheCommons.jar,
+      # gson-2.8.6.jar), which are invisible to manifest/lockfile-based
+      # scanners because they're loaded via a Gradle fileTree() glob with no
+      # group:artifact:version coordinate. See docs/dependencies/vendored-jars.md.
+      - name: Run Trivy filesystem scan
+        id: trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          format: 'json'
+          output: 'trivy-results.json'
+          # Report-only: never fail the job on findings. This is a first
+          # pass for visibility, not a merge gate (see plans/021).
+          exit-code: '0'
+
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-scan-results
+          path: trivy-results.json
+          retention-days: 7
