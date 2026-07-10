@@ -240,6 +240,10 @@ public class MultiRTUtils {
             ProgressLayout.setProgress(ProgressLayout.UNPACK_RUNTIME, 100, R.string.global_unpacking, tarEntryName);
 
             File destPath = new File(dest, tarEntry.getName());
+            String canonicalDest = dest.getCanonicalPath() + File.separator;
+            if (!destPath.getCanonicalPath().startsWith(canonicalDest)) {
+                throw new IOException("Blocked tar-slip entry outside destination directory: " + tarEntry.getName());
+            }
             File destParent = destPath.getParentFile();
             if (tarEntry.isSymbolicLink()) {
                 if(destParent != null && !destParent.exists() && !destParent.mkdirs())
