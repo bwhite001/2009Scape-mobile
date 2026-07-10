@@ -43,13 +43,15 @@ fun ScapeLogo(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             letterSpacing = 2.sp,
-            style = TextStyle(
-                shadow = Shadow(
-                    color = RsColors.borderLight.copy(alpha = glow),
-                    offset = Offset(0f, 0f),
-                    blurRadius = 26f,
+            style =
+                TextStyle(
+                    shadow =
+                        Shadow(
+                            color = RsColors.borderLight.copy(alpha = glow),
+                            offset = Offset(0f, 0f),
+                            blurRadius = 26f,
+                        ),
                 ),
-            ),
         )
         Text(
             "THE WORLD AS IT WAS",

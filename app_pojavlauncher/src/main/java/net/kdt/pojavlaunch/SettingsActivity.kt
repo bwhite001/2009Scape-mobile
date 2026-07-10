@@ -45,7 +45,9 @@ import net.kdt.pojavlaunch.ui.theme.LauncherTheme
 import net.kdt.pojavlaunch.ui.theme.RsColors
 
 private data class BoolPref(val key: String, val label: String, val def: Boolean)
+
 private data class IntPref(val key: String, val label: String, val def: Int, val range: IntRange)
+
 private data class StringPref(
     val key: String,
     val label: String,
@@ -56,50 +58,58 @@ private data class StringPref(
 // Simple, safe-to-model preferences (exact SharedPreferences keys preserved).
 // GL-critical / bespoke prefs (renderer, alternate_surface, defaultRuntime,
 // gamepad remap, plugins, file import) stay in the legacy "Advanced" dialog.
-private val VIDEO_BOOLS = listOf(
-    BoolPref("ignoreNotch", "Ignore notch", false),
-    BoolPref("sustainedPerformance", "Sustained performance mode", false),
-    BoolPref("force_vsync", "Force VSync", false),
-)
-private val VIDEO_INTS = listOf(
-    IntPref("resolutionRatio", "Resolution scale", 60, 25..100),
-    IntPref("xinset", "Horizontal inset", 0, 0..100),
-)
-private val CONTROL_BOOLS = listOf(
-    BoolPref("disableGestures", "Disable gestures", false),
-    BoolPref("disableDoubleTap", "Disable double-tap to swap hands", false),
-    BoolPref("singleTapRightClick", "Single-tap opens right-click menu", false),
-    BoolPref("haptic", "Haptic feedback", true),
-    BoolPref("mouse_start", "Start with virtual mouse enabled", false),
-    BoolPref("buttonAllCaps", "Uppercase button labels", true),
-    BoolPref("enableGyro", "Enable gyro aiming", false),
-    BoolPref("gyroSmoothing", "Gyro smoothing", true),
-    BoolPref("gyroInvertX", "Invert gyro X", false),
-    BoolPref("gyroInvertY", "Invert gyro Y", false),
-)
-private val CONTROL_INTS = listOf(
-    IntPref("buttonscale", "Button size", 100, 25..500),
-    IntPref("mousescale", "Mouse pointer size", 100, 25..300),
-    IntPref("mousespeed", "Mouse speed", 100, 25..300),
-    IntPref("timeLongPressTrigger", "Long-press delay (ms)", 300, 100..1000),
-    IntPref("gyroSensitivity", "Gyro sensitivity", 100, 10..300),
-    IntPref("gyroSampleRate", "Gyro sample rate (ms)", 16, 5..50),
-    IntPref("gamepad_deadzone_scale", "Gamepad deadzone", 100, 0..200),
-)
-private val JAVA_BOOLS = listOf(
-    BoolPref("java_sandbox", "Java sandbox", true),
-)
-private val JAVA_INTS = listOf(
-    IntPref("allocation", "RAM allocation (MB)", 256, 256..1024),
-)
-private val MISC_BOOLS = listOf(
-    BoolPref("checkLibraries", "Verify library integrity", true),
-    BoolPref("arc_capes", "Arc capes", false),
-)
-private val EXPERIMENTAL_BOOLS = listOf(
-    BoolPref("dump_shaders", "Dump shaders", false),
-    BoolPref("bigCoreAffinity", "Big-core affinity", false),
-)
+private val VIDEO_BOOLS =
+    listOf(
+        BoolPref("ignoreNotch", "Ignore notch", false),
+        BoolPref("sustainedPerformance", "Sustained performance mode", false),
+        BoolPref("force_vsync", "Force VSync", false),
+    )
+private val VIDEO_INTS =
+    listOf(
+        IntPref("resolutionRatio", "Resolution scale", 60, 25..100),
+        IntPref("xinset", "Horizontal inset", 0, 0..100),
+    )
+private val CONTROL_BOOLS =
+    listOf(
+        BoolPref("disableGestures", "Disable gestures", false),
+        BoolPref("disableDoubleTap", "Disable double-tap to swap hands", false),
+        BoolPref("singleTapRightClick", "Single-tap opens right-click menu", false),
+        BoolPref("haptic", "Haptic feedback", true),
+        BoolPref("mouse_start", "Start with virtual mouse enabled", false),
+        BoolPref("buttonAllCaps", "Uppercase button labels", true),
+        BoolPref("enableGyro", "Enable gyro aiming", false),
+        BoolPref("gyroSmoothing", "Gyro smoothing", true),
+        BoolPref("gyroInvertX", "Invert gyro X", false),
+        BoolPref("gyroInvertY", "Invert gyro Y", false),
+    )
+private val CONTROL_INTS =
+    listOf(
+        IntPref("buttonscale", "Button size", 100, 25..500),
+        IntPref("mousescale", "Mouse pointer size", 100, 25..300),
+        IntPref("mousespeed", "Mouse speed", 100, 25..300),
+        IntPref("timeLongPressTrigger", "Long-press delay (ms)", 300, 100..1000),
+        IntPref("gyroSensitivity", "Gyro sensitivity", 100, 10..300),
+        IntPref("gyroSampleRate", "Gyro sample rate (ms)", 16, 5..50),
+        IntPref("gamepad_deadzone_scale", "Gamepad deadzone", 100, 0..200),
+    )
+private val JAVA_BOOLS =
+    listOf(
+        BoolPref("java_sandbox", "Java sandbox", true),
+    )
+private val JAVA_INTS =
+    listOf(
+        IntPref("allocation", "RAM allocation (MB)", 256, 256..1024),
+    )
+private val MISC_BOOLS =
+    listOf(
+        BoolPref("checkLibraries", "Verify library integrity", true),
+        BoolPref("arc_capes", "Arc capes", false),
+    )
+private val EXPERIMENTAL_BOOLS =
+    listOf(
+        BoolPref("dump_shaders", "Dump shaders", false),
+        BoolPref("bigCoreAffinity", "Big-core affinity", false),
+    )
 private const val DEFAULT_CONFIG_URL = ""
 
 /**
@@ -109,11 +119,12 @@ private const val DEFAULT_CONFIG_URL = ""
  */
 private const val MAX_CONFIG_BYTES = 512 * 1024
 
-private val SERVER_STRINGS = listOf(
-    StringPref("serverIp",   "Server IP address", "127.0.0.1"),
-    StringPref("serverPort", "Server port",       "43595", KeyboardType.Number),
-    StringPref("serverConfigUrl", "Config import URL", DEFAULT_CONFIG_URL),
-)
+private val SERVER_STRINGS =
+    listOf(
+        StringPref("serverIp", "Server IP address", "127.0.0.1"),
+        StringPref("serverPort", "Server port", "43595", KeyboardType.Number),
+        StringPref("serverConfigUrl", "Config import URL", DEFAULT_CONFIG_URL),
+    )
 
 /** Compose settings for the safe majority of preferences; advanced/GL-critical ones open the legacy dialog. */
 class SettingsActivity : BaseActivity() {
@@ -161,36 +172,39 @@ class SettingsActivity : BaseActivity() {
             Toast.makeText(this, "Set a config import URL first", Toast.LENGTH_SHORT).show()
             return
         }
-        val importMessage = if (url.startsWith("http://", ignoreCase = true)) {
-            "Importing over HTTP (unencrypted) from $url…"
-        } else {
-            "Importing config from $url…"
-        }
+        val importMessage =
+            if (url.startsWith("http://", ignoreCase = true)) {
+                "Importing over HTTP (unencrypted) from $url…"
+            } else {
+                "Importing config from $url…"
+            }
         Toast.makeText(this, importMessage, Toast.LENGTH_SHORT).show()
         Thread {
             try {
-                val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
-                    connectTimeout = 5000
-                    readTimeout = 5000
-                    requestMethod = "GET"
-                }
-                val body = conn.inputStream.use { input ->
-                    val buffer = java.io.ByteArrayOutputStream()
-                    val chunk = ByteArray(4096)
-                    var total = 0
-                    while (true) {
-                        val read = input.read(chunk)
-                        if (read < 0) break
-                        total += read
-                        if (total > MAX_CONFIG_BYTES) {
-                            throw IllegalStateException(
-                                "response too large (max $MAX_CONFIG_BYTES bytes)"
-                            )
-                        }
-                        buffer.write(chunk, 0, read)
+                val conn =
+                    (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                        connectTimeout = 5000
+                        readTimeout = 5000
+                        requestMethod = "GET"
                     }
-                    String(buffer.toByteArray(), Charsets.UTF_8)
-                }
+                val body =
+                    conn.inputStream.use { input ->
+                        val buffer = java.io.ByteArrayOutputStream()
+                        val chunk = ByteArray(4096)
+                        var total = 0
+                        while (true) {
+                            val read = input.read(chunk)
+                            if (read < 0) break
+                            total += read
+                            if (total > MAX_CONFIG_BYTES) {
+                                throw IllegalStateException(
+                                    "response too large (max $MAX_CONFIG_BYTES bytes)",
+                                )
+                            }
+                            buffer.write(chunk, 0, read)
+                        }
+                        String(buffer.toByteArray(), Charsets.UTF_8)
+                    }
                 conn.disconnect()
                 val result = applyConfigJson(repo, body)
                 runOnUiThread {
@@ -213,23 +227,24 @@ class SettingsActivity : BaseActivity() {
     private fun applyConfigFromUri(uri: Uri) {
         val repo = PojavApplication.appContainer.preferencesRepository
         try {
-            val body = contentResolver.openInputStream(uri)?.use { input ->
-                val buffer = java.io.ByteArrayOutputStream()
-                val chunk = ByteArray(4096)
-                var total = 0L
-                while (true) {
-                    val read = input.read(chunk)
-                    if (read < 0) break
-                    total += read
-                    if (!ImportGuard.isWithinSizeLimit(total)) {
-                        throw IllegalStateException(
-                            "file too large (max ${ImportGuard.MAX_IMPORT_BYTES} bytes)"
-                        )
+            val body =
+                contentResolver.openInputStream(uri)?.use { input ->
+                    val buffer = java.io.ByteArrayOutputStream()
+                    val chunk = ByteArray(4096)
+                    var total = 0L
+                    while (true) {
+                        val read = input.read(chunk)
+                        if (read < 0) break
+                        total += read
+                        if (!ImportGuard.isWithinSizeLimit(total)) {
+                            throw IllegalStateException(
+                                "file too large (max ${ImportGuard.MAX_IMPORT_BYTES} bytes)",
+                            )
+                        }
+                        buffer.write(chunk, 0, read)
                     }
-                    buffer.write(chunk, 0, read)
-                }
-                String(buffer.toByteArray(), Charsets.UTF_8)
-            } ?: throw IllegalStateException("could not read file")
+                    String(buffer.toByteArray(), Charsets.UTF_8)
+                } ?: throw IllegalStateException("could not read file")
             val result = applyConfigJson(repo, body)
             Toast.makeText(this, "Loaded $result — IP/port overridden", Toast.LENGTH_LONG).show()
             recreate()
@@ -243,7 +258,10 @@ class SettingsActivity : BaseActivity() {
      * ip_address + wl/js5/server port. Returns "ip:port"; throws on bad data.
      * Shared by both the URL import and the file-picker import.
      */
-    private fun applyConfigJson(repo: PreferencesRepository, body: String): String {
+    private fun applyConfigJson(
+        repo: PreferencesRepository,
+        body: String,
+    ): String {
         val json = org.json.JSONObject(body)
         val ipAddress = if (json.has("ip_address")) json.getString("ip_address") else null
         val ipManagement = if (json.has("ip_management")) json.getString("ip_management") else null
@@ -297,12 +315,21 @@ private fun SettingsScreen(
             LazyColumn(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp)) {
                 section("Server") {
                     SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
-                    item { Spacer(Modifier.height(8.dp)); RsButton("Import config from URL", onClick = onImportConfig, muted = true) }
-                    item { Spacer(Modifier.height(6.dp)); RsButton("Load config.json from file", onClick = onPickConfigFile, muted = true) }
+                    item {
+                        Spacer(Modifier.height(8.dp))
+                        RsButton("Import config from URL", onClick = onImportConfig, muted = true)
+                    }
+                    item {
+                        Spacer(Modifier.height(6.dp))
+                        RsButton("Load config.json from file", onClick = onPickConfigFile, muted = true)
+                    }
                 }
                 prefSection("Video", VIDEO_BOOLS, VIDEO_INTS, repo)
                 prefSection("Controls", CONTROL_BOOLS, CONTROL_INTS, repo)
-                item { Spacer(Modifier.height(8.dp)); RsButton("Edit on-screen controls", onClick = onOpenControls, muted = true) }
+                item {
+                    Spacer(Modifier.height(8.dp))
+                    RsButton("Edit on-screen controls", onClick = onOpenControls, muted = true)
+                }
                 prefSection("Java", JAVA_BOOLS, JAVA_INTS, repo)
                 item { JavaArgsRow(repo) }
                 prefSection("Misc", MISC_BOOLS, emptyList(), repo)
@@ -330,13 +357,19 @@ private fun LazyListScope.prefSection(
     items(ints) { IntRow(it, repo) }
 }
 
-private fun LazyListScope.section(title: String, content: LazyListScope.() -> Unit) {
+private fun LazyListScope.section(
+    title: String,
+    content: LazyListScope.() -> Unit,
+) {
     item { RsSectionHeader(title) }
     content()
 }
 
 @Composable
-private fun BoolRow(pref: BoolPref, repo: PreferencesRepository) {
+private fun BoolRow(
+    pref: BoolPref,
+    repo: PreferencesRepository,
+) {
     var checked by remember { mutableStateOf(repo.getBoolean(pref.key, pref.def)) }
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -351,7 +384,10 @@ private fun BoolRow(pref: BoolPref, repo: PreferencesRepository) {
 }
 
 @Composable
-private fun IntRow(pref: IntPref, repo: PreferencesRepository) {
+private fun IntRow(
+    pref: IntPref,
+    repo: PreferencesRepository,
+) {
     var value by remember { mutableIntStateOf(repo.getInt(pref.key, pref.def)) }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -378,13 +414,19 @@ private val rsFieldColors: @Composable () -> androidx.compose.material3.TextFiel
 }
 
 @Composable
-private fun StringRow(pref: StringPref, repo: PreferencesRepository) {
+private fun StringRow(
+    pref: StringPref,
+    repo: PreferencesRepository,
+) {
     var value by remember { mutableStateOf(repo.getString(pref.key, pref.def) ?: pref.def) }
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
         Text(pref.label, color = RsColors.textBody)
         OutlinedTextField(
             value = value,
-            onValueChange = { value = it; repo.putString(pref.key, it) },
+            onValueChange = {
+                value = it
+                repo.putString(pref.key, it)
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = pref.keyboardType),

@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.kdt.pojavlaunch.di.ProgressUiState
 import net.kdt.pojavlaunch.progresskeeper.ProgressKeeper
@@ -52,9 +52,13 @@ class ScapeLauncher : BaseActivity() {
         // Fire-and-forget: the foreground service still runs if the user declines.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), RC_POST_NOTIFICATIONS)
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                RC_POST_NOTIFICATIONS,
+            )
         }
 
         val keeper = ProgressServiceKeeper(this)
@@ -75,7 +79,10 @@ class ScapeLauncher : BaseActivity() {
         }
     }
 
-    private inline fun launchIfReady(state: ProgressUiState, action: () -> Unit) {
+    private inline fun launchIfReady(
+        state: ProgressUiState,
+        action: () -> Unit,
+    ) {
         when {
             state.unpackFailed -> Toast.makeText(this, R.string.unpack_failed, Toast.LENGTH_LONG).show()
             state.isBusy -> Toast.makeText(this, R.string.tasks_ongoing, Toast.LENGTH_LONG).show()

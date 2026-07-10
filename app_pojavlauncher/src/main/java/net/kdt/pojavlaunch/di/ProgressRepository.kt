@@ -29,31 +29,41 @@ class ProgressRepository {
     private val _state = MutableStateFlow(ProgressUiState())
     val state: StateFlow<ProgressUiState> = _state.asStateFlow()
 
-    private val observedKeys = listOf(
-        ProgressLayout.UNPACK_RUNTIME,
-        ProgressLayout.EXTRACT_COMPONENTS,
-        ProgressLayout.EXTRACT_SINGLE_FILES,
-        ProgressLayout.INSTALL_MODPACK,
-    )
+    private val observedKeys =
+        listOf(
+            ProgressLayout.UNPACK_RUNTIME,
+            ProgressLayout.EXTRACT_COMPONENTS,
+            ProgressLayout.EXTRACT_SINGLE_FILES,
+            ProgressLayout.INSTALL_MODPACK,
+        )
 
     // Held to keep strong references for the process lifetime.
-    private val taskCountListener = TaskCountListener { count ->
-        _state.value = _state.value.copy(taskCount = count)
-    }
+    private val taskCountListener =
+        TaskCountListener { count ->
+            _state.value = _state.value.copy(taskCount = count)
+        }
 
-    private val progressListener = object : ProgressListener {
-        override fun onProgressStarted() {}
-        override fun onProgressUpdated(progress: Int, resid: Int, vararg va: Any?) {
-            _state.value = _state.value.copy(
-                progress = progress,
-                messageResId = resid,
-                args = va.toList(),
-            )
+    private val progressListener =
+        object : ProgressListener {
+            override fun onProgressStarted() {}
+
+            override fun onProgressUpdated(
+                progress: Int,
+                resid: Int,
+                vararg va: Any?,
+            ) {
+                _state.value =
+                    _state.value.copy(
+                        progress = progress,
+                        messageResId = resid,
+                        args = va.toList(),
+                    )
+            }
+
+            override fun onProgressEnded() {
+                _state.value = _state.value.copy(progress = 0, messageResId = 0, args = emptyList())
+            }
         }
-        override fun onProgressEnded() {
-            _state.value = _state.value.copy(progress = 0, messageResId = 0, args = emptyList())
-        }
-    }
 
     init {
         observedKeys.forEach { ProgressKeeper.addListener(it, progressListener) }

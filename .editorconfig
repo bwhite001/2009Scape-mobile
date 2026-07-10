@@ -1,0 +1,9 @@
+root = true
+
+[*.kt]
+# Compose UI functions are PascalCase by community/official convention
+# (they behave like emitting a component, not an imperative function).
+# ktlint's default naming rule doesn't know about @Composable, so tell it
+# to skip naming checks on functions annotated with @Composable instead of
+# renaming every Compose function in ui/ away from the ecosystem norm.
+ktlint_function_naming_ignore_when_annotated_with = Composable

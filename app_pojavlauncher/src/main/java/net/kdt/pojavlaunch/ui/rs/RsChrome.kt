@@ -46,7 +46,7 @@ fun RsPanel(
                 .padding(2.dp)
                 .background(RsColors.borderDark)
                 .padding(1.dp)
-                .background(RsColors.bgPanel)
+                .background(RsColors.bgPanel),
         ) {
             if (header != null) RsHeaderBand(header)
             Column(Modifier.padding(16.dp), content = content)
@@ -68,22 +68,25 @@ private fun BoxScope.Rivet(alignment: Alignment) {
             .clip(RoundedCornerShape(50))
             .background(
                 Brush.radialGradient(
-                    listOf(RsColors.borderLight, RsColors.borderGold, RsColors.borderDark)
-                )
-            )
+                    listOf(RsColors.borderLight, RsColors.borderGold, RsColors.borderDark),
+                ),
+            ),
     )
 }
 
 /** Gold gradient title band used at the top of a panel. */
 @Composable
-fun RsHeaderBand(title: String, modifier: Modifier = Modifier) {
+fun RsHeaderBand(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    listOf(RsColors.borderGold, Color(0xFF4A3008), RsColors.borderDark)
-                )
+                    listOf(RsColors.borderGold, Color(0xFF4A3008), RsColors.borderDark),
+                ),
             )
             .padding(vertical = 6.dp),
         contentAlignment = Alignment.Center,
@@ -115,7 +118,7 @@ fun RsSectionHeader(text: String) {
             Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(RsColors.borderGold.copy(alpha = 0.4f))
+                .background(RsColors.borderGold.copy(alpha = 0.4f)),
         )
     }
 }

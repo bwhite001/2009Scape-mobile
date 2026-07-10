@@ -38,11 +38,12 @@ fun RsButton(
     modifier: Modifier = Modifier,
     muted: Boolean = false,
 ) {
-    val gradient = if (muted) {
-        Brush.verticalGradient(listOf(Color(0xFF5A4020), Color(0xFF3A2810), Color(0xFF1E1408)))
-    } else {
-        Brush.verticalGradient(listOf(RsColors.greenLight, RsColors.greenRs, RsColors.greenDark))
-    }
+    val gradient =
+        if (muted) {
+            Brush.verticalGradient(listOf(Color(0xFF5A4020), Color(0xFF3A2810), Color(0xFF1E1408)))
+        } else {
+            Brush.verticalGradient(listOf(RsColors.greenLight, RsColors.greenRs, RsColors.greenDark))
+        }
     val outline = if (muted) RsColors.borderGold else Color(0xFF4AB828)
     val label = if (muted) RsColors.parchment else RsColors.greenText
     Box(
@@ -73,7 +74,10 @@ fun RsButton(
 
 /** RS2 toggle: inset dark track with a gold square knob; green glow when on. */
 @Composable
-fun RsToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+fun RsToggle(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     val knobOffset by animateDpAsState(if (checked) 24.dp else 2.dp, label = "knob")
     Box(
         Modifier
@@ -97,7 +101,7 @@ fun RsToggle(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
                         Brush.radialGradient(listOf(RsColors.greenLight, RsColors.greenRs))
                     } else {
                         Brush.radialGradient(listOf(RsColors.borderGold, Color(0xFF4A3008)))
-                    }
+                    },
                 ),
         )
     }
@@ -116,11 +120,12 @@ fun RsSlider(
         onValueChange = onValueChange,
         onValueChangeFinished = onValueChangeFinished,
         valueRange = valueRange,
-        colors = SliderDefaults.colors(
-            thumbColor = RsColors.borderLight,
-            activeTrackColor = RsColors.borderGold,
-            inactiveTrackColor = RsColors.borderDark,
-        ),
+        colors =
+            SliderDefaults.colors(
+                thumbColor = RsColors.borderLight,
+                activeTrackColor = RsColors.borderGold,
+                inactiveTrackColor = RsColors.borderDark,
+            ),
     )
 }
 
@@ -147,7 +152,10 @@ fun RsBackButton(onClick: () -> Unit) {
 
 /** Centered parchment text link. */
 @Composable
-fun RsLink(text: String, onClick: () -> Unit) {
+fun RsLink(
+    text: String,
+    onClick: () -> Unit,
+) {
     Text(
         text.uppercase(),
         color = RsColors.parchmentDark,
@@ -155,10 +163,11 @@ fun RsLink(text: String, onClick: () -> Unit) {
         fontSize = 13.sp,
         letterSpacing = 1.sp,
         textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(8.dp),
     )
 }
 

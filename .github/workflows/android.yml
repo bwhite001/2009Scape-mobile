@@ -57,6 +57,10 @@ jobs:
         run: |
           gradle :app_pojavlauncher:testDebugUnitTest --stacktrace
 
+      - name: Check Kotlin style
+        run: |
+          gradle :app_pojavlauncher:ktlintCheck --stacktrace
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4

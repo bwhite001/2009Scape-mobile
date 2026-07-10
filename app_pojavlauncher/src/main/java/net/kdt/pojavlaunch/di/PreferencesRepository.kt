@@ -19,13 +19,35 @@ import net.kdt.pojavlaunch.prefs.LauncherPreferences
 class PreferencesRepository(private val context: Context) {
     val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    fun getBoolean(key: String, def: Boolean): Boolean = prefs.getBoolean(key, def)
-    fun getInt(key: String, def: Int): Int = prefs.getInt(key, def)
-    fun getString(key: String, def: String?): String? = prefs.getString(key, def)
+    fun getBoolean(
+        key: String,
+        def: Boolean,
+    ): Boolean = prefs.getBoolean(key, def)
 
-    fun putBoolean(key: String, value: Boolean) = commit { putBoolean(key, value) }
-    fun putInt(key: String, value: Int) = commit { putInt(key, value) }
-    fun putString(key: String, value: String?) = commit { putString(key, value) }
+    fun getInt(
+        key: String,
+        def: Int,
+    ): Int = prefs.getInt(key, def)
+
+    fun getString(
+        key: String,
+        def: String?,
+    ): String? = prefs.getString(key, def)
+
+    fun putBoolean(
+        key: String,
+        value: Boolean,
+    ) = commit { putBoolean(key, value) }
+
+    fun putInt(
+        key: String,
+        value: Int,
+    ) = commit { putInt(key, value) }
+
+    fun putString(
+        key: String,
+        value: String?,
+    ) = commit { putString(key, value) }
 
     private inline fun commit(block: SharedPreferences.Editor.() -> Unit) {
         prefs.edit().apply(block).apply()
@@ -37,11 +59,13 @@ class PreferencesRepository(private val context: Context) {
     }
 
     /** Emits the changed preference key whenever any preference changes. */
-    val changes: Flow<String> = callbackFlow {
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key != null) trySendBlocking(key)
+    val changes: Flow<String> =
+        callbackFlow {
+            val listener =
+                SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                    if (key != null) trySendBlocking(key)
+                }
+            prefs.registerOnSharedPreferenceChangeListener(listener)
+            awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
         }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
 }

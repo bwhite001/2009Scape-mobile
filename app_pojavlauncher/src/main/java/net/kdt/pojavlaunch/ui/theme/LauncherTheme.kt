@@ -12,38 +12,41 @@ import androidx.compose.ui.text.font.FontWeight
 import net.kdt.pojavlaunch.R
 
 // ── RuneScape interface fonts (genuine RS TTFs, bundled in res/font) ──
-val RsFontFamily: FontFamily = FontFamily(
-    Font(R.font.runescape, FontWeight.Normal),
-    Font(R.font.runescape_bold, FontWeight.Bold),
-)
+val RsFontFamily: FontFamily =
+    FontFamily(
+        Font(R.font.runescape, FontWeight.Normal),
+        Font(R.font.runescape_bold, FontWeight.Bold),
+    )
 val RsDisplayFamily: FontFamily = FontFamily(Font(R.font.runescape_bold, FontWeight.Bold))
 
 /** Material 3 typography with the RuneScape font applied to the styles we use. */
-val RsTypography: Typography = with(Typography()) {
-    copy(
-        displaySmall = displaySmall.copy(fontFamily = RsDisplayFamily),
-        headlineSmall = headlineSmall.copy(fontFamily = RsDisplayFamily),
-        titleLarge = titleLarge.copy(fontFamily = RsFontFamily),
-        titleMedium = titleMedium.copy(fontFamily = RsFontFamily),
-        titleSmall = titleSmall.copy(fontFamily = RsFontFamily),
-        bodyLarge = bodyLarge.copy(fontFamily = RsFontFamily),
-        bodyMedium = bodyMedium.copy(fontFamily = RsFontFamily),
-        bodySmall = bodySmall.copy(fontFamily = RsFontFamily),
-        labelLarge = labelLarge.copy(fontFamily = RsFontFamily),
-        labelMedium = labelMedium.copy(fontFamily = RsFontFamily),
-        labelSmall = labelSmall.copy(fontFamily = RsFontFamily),
-    )
-}
+val RsTypography: Typography =
+    with(Typography()) {
+        copy(
+            displaySmall = displaySmall.copy(fontFamily = RsDisplayFamily),
+            headlineSmall = headlineSmall.copy(fontFamily = RsDisplayFamily),
+            titleLarge = titleLarge.copy(fontFamily = RsFontFamily),
+            titleMedium = titleMedium.copy(fontFamily = RsFontFamily),
+            titleSmall = titleSmall.copy(fontFamily = RsFontFamily),
+            bodyLarge = bodyLarge.copy(fontFamily = RsFontFamily),
+            bodyMedium = bodyMedium.copy(fontFamily = RsFontFamily),
+            bodySmall = bodySmall.copy(fontFamily = RsFontFamily),
+            labelLarge = labelLarge.copy(fontFamily = RsFontFamily),
+            labelMedium = labelMedium.copy(fontFamily = RsFontFamily),
+            labelSmall = labelSmall.copy(fontFamily = RsFontFamily),
+        )
+    }
 
-private val DarkColors = darkColorScheme(
-    primary = RsColors.greenRs,
-    onPrimary = RsColors.greenText,
-    secondary = RsColors.borderGold,
-    background = RsColors.bgDeep,
-    surface = RsColors.bgPanel,
-    onBackground = RsColors.textBody,
-    onSurface = RsColors.textBody,
-)
+private val DarkColors =
+    darkColorScheme(
+        primary = RsColors.greenRs,
+        onPrimary = RsColors.greenText,
+        secondary = RsColors.borderGold,
+        background = RsColors.bgDeep,
+        surface = RsColors.bgPanel,
+        onBackground = RsColors.textBody,
+        onSurface = RsColors.textBody,
+    )
 
 private val LightColors = lightColorScheme(primary = RsColors.greenRs)
 
