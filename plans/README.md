@@ -42,7 +42,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 | 018 | Extract + unit-test server-config normalizer (dedupe port logic) | P1 | M | tests | — | DONE |
 | 012 | Remove 3× `System.gc()` on the UI thread | P2 | S | bug | — | DONE |
 | 014 | Config-import transport (cleartext scoping, default URL, read cap) | P2 | S–M | security | — | DONE |
-| 015 | Zip-bomb size/entry caps in `ZipTool.unzip` | P2 | M | security | — | TODO |
+| 015 | Zip-bomb size/entry caps in `ZipTool.unzip` | P2 | M | security | — | DONE |
 | 016 | Surface `AsyncAssetManager` unpack failures (no false "done") | P2 | M | bug | — | TODO |
 | 017 | Null `MainActivity` static Views in `onDestroy` (+guards) | P2 | S–M | bug | — | TODO |
 | 021 | Dependency vuln-scan CI job + inventory `libs/*.jar` | P2 | S | security | — | TODO |
