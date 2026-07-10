@@ -33,7 +33,7 @@ Ordered by leverage. Independent unless "Depends on" says otherwise; same-priori
 
 | Plan | Title | Priority | Effort | Cat | Depends on | Status |
 |------|-------|----------|--------|-----|------------|--------|
-| 007 | Remove broken `gradle-publish.yml` (fails every release) | P1 | S | dx | — | TODO |
+| 007 | Remove broken `gradle-publish.yml` (fails every release) | P1 | S | dx | — | DONE |
 | 008 | Fix stale "no unit tests" docs (CLAUDE.md, plans/README) | P1 | S | docs | — | TODO |
 | 009 | Wire `testDebugUnitTest` into CI | P1 | S | tests | — | TODO |
 | 010 | Fix `ProgressKeeper` CME on task completion | P1 | S | bug | — | TODO |
