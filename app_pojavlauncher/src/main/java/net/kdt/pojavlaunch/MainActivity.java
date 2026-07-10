@@ -397,11 +397,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             LauncherPreferences.PREF_MOUSESPEED = ((float)tmpMouseSpeed)/100f;
             LauncherPreferences.DEFAULT_PREF.edit().putInt("mousespeed",tmpMouseSpeed).apply();
             dialogInterface.dismiss();
-            System.gc();
         });
         b.setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> {
             dialogInterface.dismiss();
-            System.gc();
         });
         b.show();
     }
@@ -499,7 +497,6 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         try {
             MainActivity.mControlLayout.loadLayout((CustomControls)null);
             MainActivity.mControlLayout.setModifiable(false);
-            System.gc();
             MainActivity.mControlLayout.loadLayout(LauncherPreferences.PREF_DEFAULTCTRL_PATH);
             mControlLayout.setMouseButtonsVisible(false);
             mDrawerPullButton.setVisibility(mControlLayout.hasMenuButton() ? View.GONE : View.VISIBLE);
