@@ -53,6 +53,18 @@ jobs:
           gradle :app_pojavlauncher:assembleDebug --stacktrace
           mv app_pojavlauncher/build/outputs/apk/debug/app_pojavlauncher-debug.apk out/app-debug.apk
 
+      - name: Run unit tests
+        run: |
+          gradle :app_pojavlauncher:testDebugUnitTest --stacktrace
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: app_pojavlauncher/build/test-results/testDebugUnitTest/
+          retention-days: 7
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
