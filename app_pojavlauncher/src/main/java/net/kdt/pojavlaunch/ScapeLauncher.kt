@@ -76,10 +76,10 @@ class ScapeLauncher : BaseActivity() {
     }
 
     private inline fun launchIfReady(state: ProgressUiState, action: () -> Unit) {
-        if (state.isBusy) {
-            Toast.makeText(this, R.string.tasks_ongoing, Toast.LENGTH_LONG).show()
-        } else {
-            action()
+        when {
+            state.unpackFailed -> Toast.makeText(this, R.string.unpack_failed, Toast.LENGTH_LONG).show()
+            state.isBusy -> Toast.makeText(this, R.string.tasks_ongoing, Toast.LENGTH_LONG).show()
+            else -> action()
         }
     }
 

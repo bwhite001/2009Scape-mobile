@@ -339,6 +339,7 @@
     <string name="main_login_done">Login done</string>
     <string name="main_add_account">Add account</string>
     <string name="tasks_ongoing">Tasks are in progress, please wait</string>
+    <string name="unpack_failed">Setup failed to complete — check available storage and restart the app.</string>
     <string name="no_saved_accounts">No saved accounts</string>
     <string name="downloading_versions">Downloading version list…</string>
     <string name="mc_download_failed">Failed to download Minecraft! This could be due to bad network connection, incorrectly placed files, etc..</string>
