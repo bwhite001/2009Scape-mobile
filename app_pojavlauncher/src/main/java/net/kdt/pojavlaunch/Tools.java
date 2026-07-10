@@ -556,6 +556,15 @@ public final class Tools {
     public static class ZipTool
     {
         private ZipTool(){}
+
+        // Zip-bomb guards for unzip(): caps chosen comfortably above the largest
+        // bundled plugin (~3.4 MB / 5 entries as of plan 015) to leave headroom for
+        // future bundled plugin growth, while still bounding storage exhaustion from
+        // an untrusted, user-picked zip (Settings -> Advanced -> Load plugin).
+        private static final long MAX_TOTAL_UNCOMPRESSED_BYTES = 200L * 1024 * 1024; // 200 MB
+        private static final long MAX_ENTRY_UNCOMPRESSED_BYTES = 50L * 1024 * 1024;  // 50 MB
+        private static final int MAX_ENTRY_COUNT = 5000;
+
         public static void zip(List<File> files, File zipFile) throws IOException {
             final int BUFFER_SIZE = 2048;
 
@@ -595,8 +604,15 @@ public final class Tools {
             try {
                 ZipEntry ze;
                 int count;
+                int entryIndex = 0;
+                long totalUncompressedBytes = 0;
                 byte[] buffer = new byte[BUFFER_SIZE];
                 while ((ze = zis.getNextEntry()) != null) {
+                    entryIndex++;
+                    if (entryIndex > MAX_ENTRY_COUNT) {
+                        throw new IOException("Blocked zip with too many entries (limit "
+                                + MAX_ENTRY_COUNT + "): " + ze.getName());
+                    }
                     File file = new File(targetDirectory, ze.getName());
                     String canonicalTarget = targetDirectory.getCanonicalPath() + File.separator;
                     if (!file.getCanonicalPath().startsWith(canonicalTarget)) {
@@ -608,10 +624,26 @@ public final class Tools {
                                 dir.getAbsolutePath());
                     if (ze.isDirectory())
                         continue;
+                    long entryUncompressedBytes = 0;
                     FileOutputStream fout = new FileOutputStream(file);
                     try {
-                        while ((count = zis.read(buffer)) != -1)
+                        while ((count = zis.read(buffer)) != -1) {
+                            entryUncompressedBytes += count;
+                            totalUncompressedBytes += count;
+                            if (entryUncompressedBytes > MAX_ENTRY_UNCOMPRESSED_BYTES
+                                    || totalUncompressedBytes > MAX_TOTAL_UNCOMPRESSED_BYTES) {
+                                fout.close();
+                                //noinspection ResultOfMethodCallIgnored
+                                file.delete();
+                                if (entryUncompressedBytes > MAX_ENTRY_UNCOMPRESSED_BYTES) {
+                                    throw new IOException("Blocked zip entry exceeding max uncompressed size ("
+                                            + MAX_ENTRY_UNCOMPRESSED_BYTES + " bytes): " + ze.getName());
+                                }
+                                throw new IOException("Blocked zip exceeding max total uncompressed size ("
+                                        + MAX_TOTAL_UNCOMPRESSED_BYTES + " bytes), aborted at entry: " + ze.getName());
+                            }
                             fout.write(buffer, 0, count);
+                        }
                     } finally {
                         fout.close();
                     }
