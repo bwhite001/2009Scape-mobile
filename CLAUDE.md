@@ -54,7 +54,7 @@ CI (`.github/workflows/android.yml`) is the canonical build recipe. Replicate it
 
 Other build types (`app_pojavlauncher/build.gradle`): `debug` (suffix `.debug`, signed with the checked-in `debug.keystore` / password `android`), `proguard` (minified), `release`, `gplay` (Play Store, signed with `upload.jks` via `GPLAY_KEYSTORE_PASSWORD` env). `versionCode` is derived from the date (or GitHub run number in CI); `versionName` comes from `git describe --tags`.
 
-There are **no unit tests** in this repo (`CriticalNativeTest.java` / `TestStorageActivity.java` are runtime checks, not JUnit). Verification is: does the APK build and does it launch the client on-device. Device smoke checklist: `docs/verification/device-smoke-checklist.md`.
+A JUnit 4 unit-test suite exists under `app_pojavlauncher/src/test/java/` (e.g. `customcontrols/CameraPanTest.java`, testing the pure-logic `CameraPan` class with no Android framework dependency — the pattern to follow for new tests). Run it with `./gradlew :app_pojavlauncher:testDebugUnitTest` (via the Docker build image described above). Beyond that, verification is: does the APK build, and does it launch and behave correctly on-device. Device smoke checklist: `docs/verification/device-smoke-checklist.md`.
 
 ### Native code (NDK)
 
