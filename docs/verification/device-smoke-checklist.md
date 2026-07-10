@@ -11,6 +11,9 @@ and `adb install -r`. Tick every item before merging a shell change.
 - [ ] First run: runtime/asset unpack shows progress and completes; game launches afterward.
 - [ ] SD: two-finger map-drag, lift one finger mid-drag — camera pans cleanly, no stuck click.
 
+## Stylus (if device available)
+- [ ] (S-Pen only) Finger down, stylus barrel-tap, lift stylus first — no stuck right-click.
+
 ## Compose home (ScapeLauncher)
 - [ ] Home renders (title, Play HD, Play SD, Settings).
 - [ ] Progress indicator appears while unpack/download tasks run and clears when done.

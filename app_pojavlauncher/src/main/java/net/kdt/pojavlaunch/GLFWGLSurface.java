@@ -288,7 +288,8 @@ public class GLFWGLSurface extends View implements GrabListener {
                             ? LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_RIGHT
                             : LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT;
                     sendMouseButton(mStylusButton, true);
-                } else if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL){
+                } else if(action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL
+                        || (action == MotionEvent.ACTION_POINTER_UP && e.getActionIndex() == i)){
                     sendMouseButton(mStylusButton, false);
                 }
             }
