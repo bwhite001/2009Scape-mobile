@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ fun RsButton(
     val label = if (muted) RsColors.parchment else RsColors.greenText
     Box(
         modifier
+            .minimumInteractiveComponentSize()
             .fillMaxWidth()
             .clip(RoundedCornerShape(3.dp))
             .background(RsColors.borderDark)
@@ -57,7 +59,7 @@ fun RsButton(
             .background(RsColors.borderDark)
             .padding(1.dp)
             .background(gradient)
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick, role = Role.Button)
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -81,6 +83,7 @@ fun RsToggle(
     val knobOffset by animateDpAsState(if (checked) 24.dp else 2.dp, label = "knob")
     Box(
         Modifier
+            .minimumInteractiveComponentSize()
             .size(width = 44.dp, height = 22.dp)
             .clip(RoundedCornerShape(2.dp))
             .background(if (checked) RsColors.greenDark else RsColors.toggleOff)
@@ -114,12 +117,14 @@ fun RsSlider(
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChangeFinished: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Slider(
         value = value,
         onValueChange = onValueChange,
         onValueChangeFinished = onValueChangeFinished,
         valueRange = valueRange,
+        modifier = modifier,
         colors =
             SliderDefaults.colors(
                 thumbColor = RsColors.borderLight,
@@ -134,10 +139,11 @@ fun RsSlider(
 fun RsBackButton(onClick: () -> Unit) {
     Box(
         Modifier
+            .minimumInteractiveComponentSize()
             .clip(RoundedCornerShape(2.dp))
             .background(Brush.verticalGradient(listOf(Color(0xFF2A5010), Color(0xFF1A3008))))
             .border(1.dp, RsColors.greenDark, RoundedCornerShape(2.dp))
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick, role = Role.Button)
             .padding(horizontal = 12.dp, vertical = 5.dp),
     ) {
         Text(
@@ -165,8 +171,9 @@ fun RsLink(
         textAlign = TextAlign.Center,
         modifier =
             Modifier
+                .minimumInteractiveComponentSize()
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(onClick = onClick, role = Role.Button)
                 .padding(8.dp),
     )
 }
