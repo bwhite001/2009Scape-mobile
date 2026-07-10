@@ -23,7 +23,7 @@ xz = "1.8"
 exp4j = "60eaec6f78"
 htmlcleaner = "2.6.1"
 appcompat = "1.6.1"
-material = "1.5.0"
+material = "1.12.0"
 
 [libraries]
 javax-annotation = { module = "javax.annotation:javax.annotation-api", version.ref = "javaxAnnotation" }
