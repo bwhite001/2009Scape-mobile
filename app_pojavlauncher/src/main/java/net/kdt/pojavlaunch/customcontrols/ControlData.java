@@ -41,8 +41,7 @@ public class ControlData {
     public static final String[] COMMAND_PRESETS = {
         "::bank", "::home", "::empty", "::emptybank", "::players",
         "::max", "::god", "::killme", "::allmusic", "::allquest",
-        "::fpson", "::debug", "::togglexp", "::toggleslayer",
-        "::highscores", "::stats", "::shop", "::loc", "::quests",
+        "::fpson", "::debug", "::stats", "::shop", "::loc", "::quests",
     };
 
     private static ControlData[] SPECIAL_BUTTONS;
