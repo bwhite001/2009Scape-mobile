@@ -78,6 +78,7 @@ public class EditControlPopup {
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     protected Switch mToggleSwitch, mPassthroughSwitch, mSwipeableSwitch;
     protected Spinner mOrientationSpinner;
+    protected Spinner mCommandSpinner;
     protected final Spinner[] mKeycodeSpinners = new Spinner[4];
     protected SeekBar mStrokeWidthSeekbar, mCornerRadiusSeekbar, mAlphaSeekbar;
     protected TextView mStrokePercentTextView, mCornerRadiusPercentTextView, mAlphaPercentTextView;
@@ -226,6 +227,12 @@ public class EditControlPopup {
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
 
         mOrientationSpinner.setAdapter(adapter);
+
+        ArrayAdapter<String> commandAdapter =
+            new ArrayAdapter<>(mScrollView.getContext(), android.R.layout.simple_spinner_item);
+        commandAdapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+        commandAdapter.addAll(ControlData.COMMAND_PRESETS);
+        mCommandSpinner.setAdapter(commandAdapter);
     }
 
 
@@ -276,6 +283,19 @@ public class EditControlPopup {
                 mKeycodeSpinners[i].setSelection(EfficientAndroidLWJGLKeycode.getIndexByValue(data.keycodes[i]) + mSpecialArray.size());
             }
         }
+
+        refreshCommandVisibility(data);
+    }
+
+    /** Show the command picker only for command buttons; preselect the saved command. */
+    private void refreshCommandVisibility(ControlData data) {
+        boolean isCommand = data.keycodes.length > 0 && data.keycodes[0] == ControlData.SPECIALBTN_COMMAND;
+        mCommandSpinner.setVisibility(isCommand ? VISIBLE : GONE);
+        mScrollView.findViewById(R.id.editCommand_textView).setVisibility(isCommand ? VISIBLE : GONE);
+        if (isCommand) {
+            int idx = java.util.Arrays.asList(ControlData.COMMAND_PRESETS).indexOf(data.commandText);
+            mCommandSpinner.setSelection(idx >= 0 ? idx : 0);
+        }
     }
 
     /** Load values for extended control data */
@@ -297,6 +317,9 @@ public class EditControlPopup {
         mSwipeableSwitch.setVisibility(View.GONE);
         mPassthroughSwitch.setVisibility(View.GONE);
         mToggleSwitch.setVisibility(View.GONE);
+
+        mCommandSpinner.setVisibility(GONE);
+        mScrollView.findViewById(R.id.editCommand_textView).setVisibility(GONE);
     }
 
     /** Load values for the joystick */
@@ -319,6 +342,9 @@ public class EditControlPopup {
         mSwipeableSwitch.setVisibility(View.GONE);
         mPassthroughSwitch.setVisibility(View.GONE);
         mToggleSwitch.setVisibility(View.GONE);
+
+        mCommandSpinner.setVisibility(GONE);
+        mScrollView.findViewById(R.id.editCommand_textView).setVisibility(GONE);
     }
 
 
@@ -335,6 +361,7 @@ public class EditControlPopup {
         mKeycodeSpinners[2] = mScrollView.findViewById(R.id.editMapping_spinner_3);
         mKeycodeSpinners[3] = mScrollView.findViewById(R.id.editMapping_spinner_4);
         mOrientationSpinner = mScrollView.findViewById(R.id.editOrientation_spinner);
+        mCommandSpinner = mScrollView.findViewById(R.id.editCommand_spinner);
         mStrokeWidthSeekbar = mScrollView.findViewById(R.id.editStrokeWidth_seekbar);
         mCornerRadiusSeekbar = mScrollView.findViewById(R.id.editCornerRadius_seekbar);
         mAlphaSeekbar = mScrollView.findViewById(R.id.editButtonOpacity_seekbar);
@@ -480,12 +507,28 @@ public class EditControlPopup {
                     } else {
                         mCurrentlyEditedButton.getProperties().keycodes[finalI] = EfficientAndroidLWJGLKeycode.getValueByIndex(mKeycodeSpinners[finalI].getSelectedItemPosition() - mSpecialArray.size());
                     }
+                    if (finalI == 0) {
+                        refreshCommandVisibility(mCurrentlyEditedButton.getProperties());
+                    }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
         }
+
+
+        mCommandSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mCurrentlyEditedButton != null) {
+                    mCurrentlyEditedButton.getProperties().commandText = ControlData.COMMAND_PRESETS[position];
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
 
         mOrientationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
