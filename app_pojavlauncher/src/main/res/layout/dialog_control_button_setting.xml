@@ -192,6 +192,23 @@
             app:layout_constraintStart_toEndOf="@id/editMapping_spinner_3"
             app:layout_constraintTop_toBottomOf="@id/editMapping_spinner_2" />
 
+        <!-- COMMAND SECTION -->
+        <TextView
+            android:id="@+id/editCommand_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/control_command_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editMapping_spinner_4" />
+
+        <Spinner
+            android:id="@+id/editCommand_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editCommand_textView" />
 
         <!-- ORIENTATION SECTION -->
         <TextView
