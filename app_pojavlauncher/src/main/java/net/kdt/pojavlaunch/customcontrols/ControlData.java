@@ -33,6 +33,17 @@ public class ControlData {
     public static final int SPECIALBTN_SCROLLDOWN = -8;
     public static final int SPECIALBTN_MENU = -9;
     public static final int SPECIALBTN_COMMAND = -10;
+    /**
+     * Curated no-argument 2009Scape chat commands offered by the command-button
+     * picker (SPECIALBTN_COMMAND). No-arg only: ControlButton.sendChatCommand()
+     * auto-presses Enter, so a command must be complete as-is. Edit freely.
+     */
+    public static final String[] COMMAND_PRESETS = {
+        "::bank", "::home", "::empty", "::emptybank", "::players",
+        "::max", "::god", "::killme", "::allmusic", "::allquest",
+        "::fpson", "::debug", "::togglexp", "::toggleslayer",
+        "::highscores", "::stats", "::shop", "::loc", "::quests",
+    };
 
     private static ControlData[] SPECIAL_BUTTONS;
     private static List<String> SPECIAL_BUTTON_NAME_ARRAY;
@@ -70,7 +81,8 @@ public class ControlData {
                 new ControlData("MID", new int[]{SPECIALBTN_MOUSEMID}, "${margin}", "${margin}"),
                 new ControlData("SCROLLUP", new int[]{SPECIALBTN_SCROLLUP}, "${margin}", "${margin}"),
                 new ControlData("SCROLLDOWN", new int[]{SPECIALBTN_SCROLLDOWN}, "${margin}", "${margin}"),
-                new ControlData("MENU", new int[]{SPECIALBTN_MENU}, "${margin}", "${margin}")
+                new ControlData("MENU", new int[]{SPECIALBTN_MENU}, "${margin}", "${margin}"),
+                new ControlData("Command", new int[]{SPECIALBTN_COMMAND}, "${margin}", "${margin}")
             };
         }
 
