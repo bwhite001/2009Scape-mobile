@@ -424,7 +424,8 @@
 
     <!-- Settings actions -->
     <string name="settings_import_url">Import config from URL</string>
-    <string name="settings_load_file">Load config.json from file</string>
+    <string name="settings_load_file">Import server config from file</string>
+    <string name="settings_load_file_hint">Pick a server.json to set the address and ports — no typing needed.</string>
     <string name="settings_edit_controls">Edit on-screen controls</string>
     <string name="settings_open_advanced">Open advanced settings</string>
     <string name="settings_advanced_desc">Renderer, runtime, plugins, and imports</string>

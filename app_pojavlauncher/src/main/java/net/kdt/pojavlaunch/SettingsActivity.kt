@@ -327,14 +327,18 @@ private fun SettingsScreen(
             }
             LazyColumn(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp)) {
                 section(R.string.settings_section_server) {
+                    // Primary, top-of-section path: import a server.json instead of hand-typing
+                    // IP/port (the mistake that sent a client to the wrong port).
+                    item {
+                        RsButton(stringResource(R.string.settings_load_file), onClick = onPickConfigFile)
+                        Spacer(Modifier.height(4.dp))
+                        Text(stringResource(R.string.settings_load_file_hint), color = RsColors.textMuted)
+                        Spacer(Modifier.height(12.dp))
+                    }
                     SERVER_STRINGS.forEach { item(it.key) { StringRow(it, repo) } }
                     item {
                         Spacer(Modifier.height(8.dp))
                         RsButton(stringResource(R.string.settings_import_url), onClick = onImportConfig, muted = true)
-                    }
-                    item {
-                        Spacer(Modifier.height(6.dp))
-                        RsButton(stringResource(R.string.settings_load_file), onClick = onPickConfigFile, muted = true)
                     }
                 }
                 prefSection(R.string.settings_section_video, VIDEO_BOOLS, VIDEO_INTS, repo)
