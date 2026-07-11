@@ -294,7 +294,11 @@ public class EditControlPopup {
         mScrollView.findViewById(R.id.editCommand_textView).setVisibility(isCommand ? VISIBLE : GONE);
         if (isCommand) {
             int idx = java.util.Arrays.asList(ControlData.COMMAND_PRESETS).indexOf(data.commandText);
-            mCommandSpinner.setSelection(idx >= 0 ? idx : 0);
+            if (idx < 0) {
+                idx = 0;
+                data.commandText = ControlData.COMMAND_PRESETS[0];
+            }
+            mCommandSpinner.setSelection(idx);
         }
     }
 
@@ -516,7 +520,6 @@ public class EditControlPopup {
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
         }
-
 
         mCommandSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
