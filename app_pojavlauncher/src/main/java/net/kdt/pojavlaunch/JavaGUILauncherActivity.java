@@ -69,10 +69,10 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java_gui_launcher);
 
-        // Match the HD path: inset the whole SD view so corner UI (e.g. the
-        // world-map close X) clears the rounded-corner/cutout dead-zone.
-        int inset = (int) LauncherPreferences.PREF_INSET_X;
-        findViewById(R.id.sd_content_frame).setPadding(inset, inset, inset, inset);
+        // NOTE: no inset padding on SD. Padding the root shifts the AWT canvas
+        // but sendScaledMousePosition() maps touches via mTextureView's
+        // position, and the two fall out of sync -> taps miss everything.
+        // The reachability border is HD-only (see MainActivity/PREF_INSET_X).
 
         try {
             File latestLogFile = new File(Tools.DIR_GAME_HOME, "latestlog.txt");
