@@ -80,7 +80,7 @@ private val VIDEO_BOOLS =
 private val VIDEO_INTS =
     listOf(
         IntPref("resolutionRatio", R.string.pref_resolution_scale, 60, 25..100),
-        IntPref("xinset", R.string.pref_horizontal_inset, 0, 0..100),
+        IntPref("xinset", R.string.pref_horizontal_inset, 20, 0..100),
     )
 private val CONTROL_BOOLS =
     listOf(

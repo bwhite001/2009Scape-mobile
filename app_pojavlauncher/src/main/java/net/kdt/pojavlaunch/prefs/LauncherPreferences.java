@@ -74,7 +74,10 @@ public class LauncherPreferences {
         PREF_BUTTONSIZE = DEFAULT_PREF.getInt("buttonscale", 100);
         PREF_MOUSESCALE = DEFAULT_PREF.getInt("mousescale", 100);
         PREF_MOUSESPEED = ((float)DEFAULT_PREF.getInt("mousespeed",100))/100f;
-        PREF_INSET_X = DEFAULT_PREF.getInt("xinset", 0)*2;
+        // Default 20 (=40px each side): keeps corner UI like the world-map X
+        // off the rounded-corner dead-zone. Keep in sync with the settings
+        // default in SettingsActivity.kt (VIDEO_INTS "xinset").
+        PREF_INSET_X = DEFAULT_PREF.getInt("xinset", 20)*2;
         PREF_HIDE_SIDEBAR = DEFAULT_PREF.getBoolean("hideSidebar", false);
         PREF_IGNORE_NOTCH = DEFAULT_PREF.getBoolean("ignoreNotch", false);
         PREF_VERTYPE_RELEASE = DEFAULT_PREF.getBoolean("vertype_release", true);

@@ -69,6 +69,11 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java_gui_launcher);
 
+        // Match the HD path: inset the whole SD view so corner UI (e.g. the
+        // world-map close X) clears the rounded-corner/cutout dead-zone.
+        int inset = (int) LauncherPreferences.PREF_INSET_X;
+        findViewById(R.id.sd_content_frame).setPadding(inset, inset, inset, inset);
+
         try {
             File latestLogFile = new File(Tools.DIR_GAME_HOME, "latestlog.txt");
             if (!latestLogFile.exists() && !latestLogFile.createNewFile())
@@ -276,7 +281,9 @@ public class JavaGUILauncherActivity extends BaseActivity implements View.OnTouc
             }
 
             // No skip detection
-            openLogOutput(null);
+            // Don't auto-show the boot log; it covered the login canvas and
+            // couldn't be dismissed behind the control buttons. (SD has no
+            // menu to reopen it — acceptable for a LAN debug setup.)
             new Thread(() -> {
                 try {
                     final int exit = launchJavaRuntime(runtime, "");

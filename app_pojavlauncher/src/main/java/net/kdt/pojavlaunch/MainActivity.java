@@ -211,7 +211,9 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         drawerLayout = findViewById(R.id.main_drawer_options);
         navDrawer = findViewById(R.id.main_navigation_view);
         loggerView = findViewById(R.id.mainLoggerView);
-        loggerView.setVisibility(View.VISIBLE);
+        // Don't auto-show the boot log; it covered the login screen and the
+        // control buttons (translationZ=10) drew over it, stealing the close
+        // tap. Reopen from the drawer menu -> Log output when needed.
         mControlLayout = findViewById(R.id.main_control_layout);
         touchCharInput = findViewById(R.id.mainTouchCharInput);
         mDrawerPullButton = findViewById(R.id.drawer_button);
