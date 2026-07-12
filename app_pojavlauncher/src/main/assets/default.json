@@ -170,7 +170,7 @@
           "isSwipeable": false,
           "isToggle": false,
           "keycodes": [-5, 0, 0, 0],
-          "name": "Mouse",
+          "name": "MSE",
           "opacity": 1.0,
           "passThruEnabled": false,
           "strokeColor": -1,
