@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.core.widget.TextViewCompat;
+
 import net.kdt.pojavlaunch.AWTInputBridge;
 import net.kdt.pojavlaunch.AWTInputEvent;
 import net.kdt.pojavlaunch.MainActivity;
@@ -45,6 +47,11 @@ public class ControlButton extends TextView implements ControlInterface {
         setTextColor(Color.WHITE);
         setPadding(4, 4, 4, 4);
         setTextSize(14); // Nullify the default size setting
+        // ponytail: keep every label on one line and shrink-to-fit so no label
+        // wraps/clips regardless of its JSON width (e.g. "Mouse" at 44px).
+        setMaxLines(1);
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                this, 8, 14, 1, TypedValue.COMPLEX_UNIT_SP);
 
         //setOnLongClickListener(this);
 
@@ -248,14 +255,16 @@ public class ControlButton extends TextView implements ControlInterface {
 
     private void sendChatCommand(String command) {
         if (command == null || command.isEmpty()) return;
+        // The RT4 client's chat input line is always live: type straight into
+        // it, then Enter to submit. Do NOT press Enter first (as Minecraft
+        // needs to open its chat box) — Enter on an empty message line opens
+        // the RuneScape Quick Chat interface, swallowing the command.
         if (AWTInputBridge.isAwtActive) {
-            AWTInputBridge.sendKey((char) AWTInputEvent.VK_ENTER, AWTInputEvent.VK_ENTER);
             for (char c : command.toCharArray()) {
                 AWTInputBridge.sendChar(c);
             }
             AWTInputBridge.sendKey((char) AWTInputEvent.VK_ENTER, AWTInputEvent.VK_ENTER);
         } else {
-            sendKeyPress(GLFW_KEY_ENTER);
             for (char c : command.toCharArray()) {
                 org.lwjgl.glfw.CallbackBridge.sendChar(c, 0);
             }
